@@ -1,1 +1,1 @@
-worker: python omershihab bot.py
+worker: python omershihab_bot.py
