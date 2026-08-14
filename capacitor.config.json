@@ -1,6 +1,6 @@
 {
   "appId": "com.sqoor.gps",
-  "appName": "Sqoor",
+  "appName": "zoom",
   "webDir": "www",
   "server": {
     "url": "https://dainty-semolina-592a8f.netlify.app/",
