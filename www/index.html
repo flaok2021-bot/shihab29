@@ -577,7 +577,9 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
 #splashVideo {
   width:100%; height:100%;
   object-fit:cover;
+  visibility:hidden;
 }
+#splashVideo.ready { visibility:visible; }
 
 /* ─── شاشة اختيار وسيلة الاستخدام (أول فتح فقط) ─── */
 #vehicleOnboard {
@@ -641,7 +643,7 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
 <body>
 
 <div id="splashScreen">
-  <video id="splashVideo" src="https://g.top4top.io/m_3873fc9y30.mp4" autoplay muted playsinline webkit-playsinline disablepictureinpicture preload="auto"></video>
+  <video id="splashVideo" src="https://g.top4top.io/m_3873fc9y30.mp4" poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICTAEAOw==" autoplay muted playsinline webkit-playsinline disablepictureinpicture preload="auto"></video>
 </div>
 
 <!-- شاشة اختيار وسيلة الاستخدام — تظهر مرة واحدة فقط عند أول فتح للتطبيق -->
@@ -4682,9 +4684,11 @@ document.getElementById('notifOverlay').onclick = closeNotifications;
   const video = document.getElementById('splashVideo');
   if (video) {
     video.playbackRate = 1;
-    const tryPlay = () => { video.play().catch(() => {}); };
+    const tryPlay = () => { video.play().catch(() => {}); video.classList.add('ready'); };
     if (video.readyState >= 3) tryPlay();
     else video.addEventListener('canplay', tryPlay, { once:true });
+    // لو فشل تحميل الفيديو (رابط معطّل/محظور) نطلع مباشرة من السبلاش بدل عرض أيقونة معطّلة
+    video.addEventListener('error', hideSplash, { once:true });
   }
 
   const minTime  = new Promise(res => setTimeout(res, 10000));
