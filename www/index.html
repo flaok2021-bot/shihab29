@@ -8,7 +8,6 @@
 <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -219,10 +218,12 @@ body.day-mode .ov-route {
 .conf-q   { font-size:13px;color:#94a3b8;margin-top:2px; }
 .conf-actions { display:flex;gap:10px; }
 .conf-btn {
-  flex:1;padding:14px 0;border-radius:16px;font-family:'Cairo',sans-serif;
+  flex:1;padding:14px 10px;border-radius:16px;font-family:'Cairo',sans-serif;
   font-size:14px;font-weight:700;cursor:pointer;border:none;
   display:flex;align-items:center;justify-content:center;gap:7px;transition:all .2s;
+  line-height:1.3;
 }
+.conf-btn svg { width:18px;height:18px;flex-shrink:0; }
 .conf-yes { background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 4px 16px rgba(22,163,74,0.4); }
 .conf-yes:hover { transform:translateY(-1px); }
 .conf-yes:disabled { opacity:0.7;cursor:not-allowed;transform:none; }
@@ -241,7 +242,22 @@ body.day-mode .ov-route {
 #sideButtons {
   position:fixed; bottom:100px; right:14px;
   z-index:999; display:flex; flex-direction:column; gap:8px; align-items:center;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s;
+  touch-action:none;
 }
+#sideButtons.hidden-swipe { transform:translateY(140px); opacity:0; pointer-events:none; }
+#sideButtonsHandle {
+  position:fixed; bottom:100px; right:14px; z-index:999;
+  width:38px; height:26px; border-radius:13px;
+  background:rgba(10,14,26,0.85); border:1px solid rgba(34,197,94,0.3);
+  backdrop-filter:blur(14px); display:none; align-items:center; justify-content:center;
+  cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  transition:opacity .25s, transform .25s; opacity:0; transform:translateY(8px);
+}
+#sideButtonsHandle.show { display:flex; opacity:1; transform:translateY(0); }
+#sideButtonsHandle svg { width:16px;height:16px;stroke:#4ade80;stroke-width:2.2; }
+body.day-mode #sideButtonsHandle { background:rgba(240,255,245,0.9); border-color:rgba(34,197,94,0.3); }
+body.day-mode #sideButtonsHandle svg { stroke:#16a34a; }
 .sBtn {
   width:46px;height:46px;border-radius:15px;
   background:rgba(10,14,26,0.92);border:1px solid rgba(34,197,94,0.22);
@@ -424,6 +440,26 @@ body.day-mode .bb-handle span { background:rgba(0,0,0,0.2); }
 #turnBannerText { font-size:17px; font-weight:900; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.35); }
 body.day-mode #turnBanner { background:linear-gradient(135deg, rgba(22,163,74,0.96), rgba(20,120,60,0.96)); }
 
+/* ─── شريط المسافة المتبقية ووقت الوصول (أعلى المنتصف أثناء الملاحة) ─── */
+#etaBar {
+  position:fixed; top:14px; left:50%; transform:translateX(-50%) translateY(-10px);
+  z-index:998; display:none; align-items:center; gap:18px;
+  background:rgba(10,14,26,0.92); border:1px solid rgba(34,197,94,0.28);
+  border-radius:20px; padding:14px 26px; backdrop-filter:blur(16px);
+  box-shadow:0 8px 28px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  opacity:0; transition:opacity .25s, transform .25s;
+  font-family:'Cairo',sans-serif; direction:rtl; pointer-events:none;
+}
+#etaBar.show { display:flex; opacity:1; transform:translateX(-50%) translateY(0); }
+.eta-seg { display:flex; flex-direction:column; align-items:center; gap:2px; }
+.eta-val { font-size:22px; color:#e2e8f0; font-weight:800; white-space:nowrap; }
+.eta-lbl { font-size:11.5px; color:#64748b; font-weight:700; white-space:nowrap; }
+.eta-sep { width:1.5px; height:36px; background:rgba(255,255,255,0.12); }
+body.day-mode #etaBar { background:rgba(245,248,255,0.95); border-color:rgba(34,197,94,0.25); box-shadow:0 8px 28px rgba(0,0,0,0.12); }
+body.day-mode .eta-val { color:#1e293b; }
+body.day-mode .eta-lbl { color:#64748b; }
+body.day-mode .eta-sep { background:rgba(0,0,0,0.1); }
+
 /* ─── شريط الشارع القادم ─── */
 #nextStreetBar {
   position:fixed; bottom:92px; left:50%; transform:translateX(-50%) translateY(10px);
@@ -434,12 +470,20 @@ body.day-mode #turnBanner { background:linear-gradient(135deg, rgba(22,163,74,0.
   max-width:88vw; opacity:0; transition:opacity .25s, transform .25s;
   font-family:'Cairo',sans-serif; direction:rtl; pointer-events:none;
 }
+/* ذيل صغير يربط الشريط بصرياً بخط المسار تحته */
+#nextStreetBar::after {
+  content:''; position:absolute; bottom:-6px; left:50%; margin-left:-6px;
+  width:12px; height:12px; background:rgba(10,14,26,0.92);
+  border-right:1px solid rgba(34,197,94,0.28); border-bottom:1px solid rgba(34,197,94,0.28);
+  transform:rotate(45deg); border-radius:0 0 3px 0;
+}
 #nextStreetBar.show { display:flex; opacity:1; transform:translateX(-50%) translateY(0); }
 #nextStreetBar svg { width:18px; height:18px; stroke:#4ade80; stroke-width:2; flex-shrink:0; }
 .nsb-txt { display:flex; flex-direction:column; gap:1px; overflow:hidden; }
 .nsb-label { font-size:10px; color:#64748b; font-weight:700; white-space:nowrap; }
 .nsb-name { font-size:14px; color:#e2e8f0; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70vw; }
 body.day-mode #nextStreetBar { background:rgba(245,248,255,0.95); border-color:rgba(34,197,94,0.25); box-shadow:0 6px 24px rgba(0,0,0,0.12); }
+body.day-mode #nextStreetBar::after { background:rgba(245,248,255,0.95); border-color:rgba(34,197,94,0.25); }
 body.day-mode #nextStreetBar svg { stroke:#16a34a; }
 body.day-mode .nsb-name { color:#1e293b; }
 body.day-mode .nsb-label { color:#64748b; }
@@ -611,7 +655,7 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
         <span>خصوصي</span>
       </div>
       <div class="vo-card" data-choice="taxi">
-        <div class="vo-icon"><img src="https://d.top4top.io/p_3868dj0lk0.png" style="filter:brightness(0) saturate(100%) invert(76%) sepia(56%) saturate(1200%) hue-rotate(3deg) brightness(103%) contrast(103%);" alt="تكسي" /></div>
+        <div class="vo-icon"><img src="https://h.top4top.io/p_3878vo13t0.png" alt="تكسي" /></div>
         <span>تكسي</span>
       </div>
       <div class="vo-card" data-choice="bike">
@@ -749,28 +793,45 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
   </button>
 </div>
 
-<!-- أزرار الجانب: بحث + موقعي -->
-<button class="sBtn" id="btnSearch" title="بحث عن منطقة" style="position:fixed;top:14px;left:14px;z-index:999;">
-  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
-</button>
-
-<!-- زر الإعدادات + زر الإشعارات -->
-<button class="sBtn" id="btnSettings" title="الإعدادات" style="position:fixed;top:14px;right:14px;z-index:999;">
-  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-</button>
-<button class="sBtn" id="btnNotifications" title="الإشعارات" style="position:fixed;top:64px;right:14px;z-index:999;">
-  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round"/></svg>
-  <span class="notifBadge" id="notifBadge"></span>
-</button>
+<!-- شريط المسافة المتبقية ووقت الوصول — يظهر بأعلى المنتصف أثناء الملاحة فقط -->
+<div id="etaBar">
+  <div class="eta-seg">
+    <span class="eta-val" id="etaDist">--</span>
+    <span class="eta-lbl">كم متبقي</span>
+  </div>
+  <div class="eta-sep"></div>
+  <div class="eta-seg">
+    <span class="eta-val" id="etaMins">--</span>
+    <span class="eta-lbl">دقيقة متبقية</span>
+  </div>
+  <div class="eta-sep"></div>
+  <div class="eta-seg">
+    <span class="eta-val" id="etaTime">--</span>
+    <span class="eta-lbl">الوصول</span>
+  </div>
+</div>
 
 <div id="sideButtons">
+  <button class="sBtn" id="btnSearch" title="بحث عن منطقة">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
+  </button>
+  <button class="sBtn" id="btnSettings" title="الإعدادات">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="sBtn" id="btnNotifications" title="الإشعارات" style="position:relative;">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.73 21a2 2 0 0 1-3.46 0" stroke-linecap="round"/></svg>
+    <span class="notifBadge" id="notifBadge"></span>
+  </button>
   <button class="sBtn" id="btnLocate" title="موقعي">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2"/></svg>
   </button>
 </div>
+<button id="sideButtonsHandle" title="إظهار الأزرار">
+  <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>
+</button>
 
 <!-- لوحة اختيار نوع البلاغ -->
-<div id="reportPanel" style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:1000;display:none;flex-direction:column;gap:10px;background:rgba(10,14,26,0.95);border:1px solid rgba(34,197,94,0.3);border-radius:18px;padding:16px;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:230px;">
+<div id="reportPanel" style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:1000;display:none;flex-direction:column;gap:10px;background:rgba(10,14,26,0.95);border:1px solid rgba(34,197,94,0.3);border-radius:18px;padding:16px;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:230px;max-height:72vh;overflow-y:auto;">
   <div style="font-size:13px;color:#86efac;font-weight:700;text-align:center;">إضافة بلاغ</div>
   <div id="reportOptions" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
   <div style="font-size:11px;color:#475569;text-align:center;">سيُضاف البلاغ مباشرة على موقعك الحالي</div>
@@ -780,36 +841,6 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
 <div id="speedHUD" style="position:fixed;bottom:100px;left:14px;z-index:998;display:none;flex-direction:column;align-items:center;justify-content:center;width:64px;height:64px;border-radius:50%;background:rgba(10,14,26,0.92);border:2px solid rgba(34,197,94,0.4);backdrop-filter:blur(14px);box-shadow:0 4px 16px rgba(0,0,0,0.45);cursor:pointer;">
   <div id="speedVal" style="font-size:20px;font-weight:900;color:#e2e8f0;line-height:1;">0</div>
   <div style="font-size:8px;color:#4ade80;font-weight:700;margin-top:1px;">كم/س</div>
-</div>
-
-<!-- لوحة المزيد (الإعدادات) -->
-<div id="morePanel" style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:1000;display:none;flex-direction:column;gap:8px;background:rgba(10,14,26,0.95);border:1px solid rgba(34,197,94,0.3);border-radius:18px;padding:16px;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:240px;">
-  <div style="font-size:13px;color:#86efac;font-weight:700;text-align:center;margin-bottom:2px;">المزيد</div>
-
-  <button id="btnShareTrip" style="display:none;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.4);background:rgba(34,197,94,0.1);color:#4ade80;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-    <i data-lucide="navigation" style="width:18px;height:18px;"></i> مشاركة رحلتي ووقت الوصول
-  </button>
-
-  <button id="btnVoiceToggle" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-    <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="volume-2" id="voiceIcon" style="width:18px;height:18px;"></i> الإرشاد الصوتي</span>
-    <span id="voiceState" style="font-size:11px;color:#4ade80;">مفعّل</span>
-  </button>
-
-  <button id="btnVoiceTest" onclick="testVoiceNow()" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.08);color:#fbbf24;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-    <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="mic" style="width:18px;height:18px;"></i> اختبار الصوت الآن</span>
-    <span style="font-size:11px;color:#fbbf24;">جرّب</span>
-  </button>
-
-
-  <button id="btnBatterySaver" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-    <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="battery" style="width:18px;height:18px;"></i> توفير البطارية</span>
-    <span id="batteryState" style="font-size:11px;color:#64748b;">غير مفعّل</span>
-  </button>
-
-  <button id="btnSpeedLimit" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
-    <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="gauge" style="width:18px;height:18px;"></i> حد السرعة</span>
-    <span id="speedLimitVal" style="font-size:11px;color:#64748b;">80 كم/س</span>
-  </button>
 </div>
 
 <!-- ══════════════════ لوحة الإعدادات الكاملة ══════════════════ -->
@@ -857,7 +888,14 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
     <div class="stg-row" id="stgOpenCarStyle">
       <div class="stg-row-l">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>
-        <div><div class="stg-row-name">شكل سهم الملاحة</div><div class="stg-row-sub" id="stgCarStyleSub">كلاسيكي</div></div>
+        <div><div class="stg-row-name">شكل سهم الملاحة</div><div class="stg-row-sub" id="stgCarStyleSub"></div></div>
+      </div>
+      <svg class="stg-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="stg-row" id="stgOpenMore">
+      <div class="stg-row-l">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+        <div><div class="stg-row-name">المزيد</div><div class="stg-row-sub">الصوت، توفير البطارية، حد السرعة</div></div>
       </div>
       <svg class="stg-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -880,6 +918,33 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
   <div id="stgView-carStyle" style="display:none;flex-direction:column;gap:14px;">
     <div style="font-size:12px;color:#94a3b8;line-height:1.6;">اختر الشكل الذي يحل محل السيارة أثناء الملاحة بعد تحديد المسار — سهم أو السيارة الأصلية</div>
     <div id="carStyleGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+  </div>
+
+  <!-- صفحة المزيد -->
+  <div id="stgView-more" style="display:none;flex-direction:column;gap:8px;">
+    <button id="btnShareTrip" style="display:none;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.4);background:rgba(34,197,94,0.1);color:#4ade80;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <i data-lucide="navigation" style="width:18px;height:18px;"></i> مشاركة رحلتي ووقت الوصول
+    </button>
+
+    <button id="btnVoiceToggle" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="volume-2" id="voiceIcon" style="width:18px;height:18px;"></i> الإرشاد الصوتي</span>
+      <span id="voiceState" style="font-size:11px;color:#4ade80;">مفعّل</span>
+    </button>
+
+    <button id="btnVoiceTest" onclick="testVoiceNow()" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(251,191,36,0.35);background:rgba(251,191,36,0.08);color:#fbbf24;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="mic" style="width:18px;height:18px;"></i> اختبار الصوت الآن</span>
+      <span style="font-size:11px;color:#fbbf24;">جرّب</span>
+    </button>
+
+    <button id="btnBatterySaver" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="battery" style="width:18px;height:18px;"></i> توفير البطارية</span>
+      <span id="batteryState" style="font-size:11px;color:#64748b;">غير مفعّل</span>
+    </button>
+
+    <button id="btnSpeedLimit" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);color:#86efac;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="gauge" style="width:18px;height:18px;"></i> حد السرعة</span>
+      <span id="speedLimitVal" style="font-size:11px;color:#64748b;">80 كم/س</span>
+    </button>
   </div>
 
   <!-- صفحة الحساب -->
@@ -964,18 +1029,8 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
     <i data-lucide="satellite" id="satIcon"></i>
   </button>
   <div class="bar-sep"></div>
-  <button class="bBtn" id="btnZoomIn" data-tip="تكبير">
-    <span class="bBtn-txt">+</span>
-  </button>
-  <button class="bBtn" id="btnZoomOut" data-tip="تصغير">
-    <span class="bBtn-txt">−</span>
-  </button>
-  <div class="bar-sep"></div>
   <button class="bBtn" id="btnAltRoute" data-tip="مسار بديل" style="display:none;">
     <i data-lucide="shuffle"></i>
-  </button>
-  <button class="bBtn" id="btnMore" data-tip="المزيد">
-    <i data-lucide="more-horizontal"></i>
   </button>
 </div>
 
@@ -1264,6 +1319,8 @@ let destMkr     = null;
 let routeReady  = false;
 let currentRouteMins = null;
 let currentRouteDistKm = null;
+let totalRouteDistM = 0;      // إجمالي مسافة المسار بالمتر (من OSRM) — لحساب المتبقي حياً
+let totalRouteDurationS = 0;  // إجمالي زمن المسار بالثواني (من OSRM) — لحساب الوقت المتبقي حياً
 let routeCoords = null;
 let maxRouteSeg = 0;
 let followMode  = false;
@@ -1475,12 +1532,11 @@ function speakWeb(text) {
 // ARROW MARKER — سهم افتراضي ثابت قبل تحديد المسار، ويتحول لسهم بشكل مختلف (بدل صورة السيارة) بعد تحديد المسار
 // ══════════════════════════════════════════════
 let carColorFilter = 'none';
-const CAR_IMG_NAV = 'https://d.top4top.io/p_3868dj0lk0.png';
-const CAR_BRAKE_IMG_NAV = 'https://j.top4top.io/p_3873p41y00.png'; // نفس السيارة مع إضاءة أضواء الفرامل
+const CAR_IMG_PRIVATE = 'https://d.top4top.io/p_3868dj0lk0.png';
+const CAR_BRAKE_IMG_PRIVATE = 'https://j.top4top.io/p_3873p41y00.png'; // نفس سيارة الخصوصي مع إضاءة أضواء الفرامل
+const CAR_IMG_TAXI = 'https://h.top4top.io/p_3878vo13t0.png';
+const CAR_BRAKE_IMG_TAXI = 'https://i.top4top.io/p_3878qiewx1.png'; // نفس سيارة التكسي مع إضاءة أضواء الفرامل
 const BIKE_IMG_NAV = 'https://e.top4top.io/p_38737xdm50.png';
-
-// فلتر تلوين "تكسي" (يحوّل السيارة البيضاء لصفراء) — يُطبّق فوق نفس صورة السيارة
-const TAXI_YELLOW_FILTER = 'brightness(0) saturate(100%) invert(76%) sepia(56%) saturate(1200%) hue-rotate(3deg) brightness(103%) contrast(103%)';
 
 // تدرجات ألوان الدراجة (تلوّن الدراجة وملابس السائق معاً بنفس درجة اللون) — تُختار من شاشة الترحيب أو لاحقاً من الإعدادات
 const BIKE_COLOR_PRESETS = [
@@ -1506,16 +1562,18 @@ const DEFAULT_ARROW_SVG = `
 // أسهم بنفس النمط "الكلاسيكي" العادي (تعبئة لونية واحدة، بدون تدرج) بأشكال مختلفة + خيار السيارة/التكسي/الدراجة — تحل محل صورة السيارة أثناء الملاحة، تُختار من الإعدادات
 const ARROW_STYLES = [
   { name:'كلاسيكي', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>` },
-  { name:'مؤشر', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>` },
-  { name:'طائرة ورقية', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>` },
   { name:'مثلث', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><path d="M12 2 22 22H2Z"/></svg>` },
   { name:'شيفرون', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><path d="M4 18 12 3 20 18 12 14Z"/></svg>` },
-  { name:'ماسة', svg:`<svg width="52" height="52" viewBox="0 0 24 24" fill="#22c55e" stroke="#083b1c" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"><path d="M12 2 21 12 12 22 3 12Z"/></svg>` },
-  { name:'سيارة', svg:`<img src="${CAR_IMG_NAV}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;filter:${savedVehicleChoice==='taxi'?TAXI_YELLOW_FILTER:'none'};" draggable="false" />` },
+  { name:'سيارة', svg:`<img src="${CAR_IMG_PRIVATE}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;" draggable="false" />` },
+  { name:'تكسي', svg:`<img src="${CAR_IMG_TAXI}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;" draggable="false" />` },
   { name:'دراجة', svg:`<img src="${BIKE_IMG_NAV}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;filter:${savedBikeFilter};" draggable="false" />` }
 ];
-// إذا اختار المستخدم "دراجة" بشاشة الترحيب، نخليها هي الافتراضية عند أول تشغيل فقط (ما عندنا اختيار سابق محفوظ بعد)
-const defaultArrowIdx = (savedVehicleChoice === 'bike' && localStorage.getItem('sqoor_car_style') === null) ? ARROW_STYLES.length - 1 : 0;
+// إذا اختار المستخدم "دراجة" أو "تكسي" بشاشة الترحيب، نخليها هي الافتراضية عند أول تشغيل فقط (ما عندنا اختيار سابق محفوظ بعد)
+const defaultArrowIdx = localStorage.getItem('sqoor_car_style') === null
+  ? (savedVehicleChoice === 'bike' ? ARROW_STYLES.findIndex(s => s.name === 'دراجة')
+    : savedVehicleChoice === 'taxi' ? ARROW_STYLES.findIndex(s => s.name === 'تكسي')
+    : 0)
+  : 0;
 const savedArrowStyleIdx = Math.min(parseInt(localStorage.getItem('sqoor_car_style') || String(defaultArrowIdx), 10) || 0, ARROW_STYLES.length - 1);
 let currentNavArrowSvg = (ARROW_STYLES[savedArrowStyleIdx] || ARROW_STYLES[0]).svg;
 let arrowImgEl = null;
@@ -1539,22 +1597,6 @@ function makeArrowEl() {
   `;
   rot.innerHTML = DEFAULT_ARROW_SVG;
 
-  // لمبتا إشارة الانعطاف — مثبّتتان على جسم السيارة نفسه فتدوران معه
-  const lightCss = `
-    position:absolute; top:50%; width:15px; height:15px; margin-top:-7.5px;
-    border-radius:50%; background:#94a3b8; opacity:0.35; pointer-events:none;
-    box-shadow:0 0 4px rgba(0,0,0,0.5) inset; transition:opacity .1s, background .1s, box-shadow .1s;
-    z-index:5;
-  `;
-  const leftLight  = document.createElement('div');
-  leftLight.style.cssText  = lightCss + 'left:-3px;';
-  const rightLight = document.createElement('div');
-  rightLight.style.cssText = lightCss + 'right:-3px;';
-  rot.appendChild(leftLight);
-  rot.appendChild(rightLight);
-  turnLightLeftEl  = leftLight;
-  turnLightRightEl = rightLight;
-
   d.appendChild(rot);
   arrowRotEl = rot;
   arrowImgEl = rot.querySelector('svg') || rot.querySelector('img');
@@ -1575,9 +1617,10 @@ let prevSpeedForBrake = 0;
 let brakeModeActive   = false;
 function updateCarBrakeVisual(kmh) {
   if (!arrowImgEl || arrowImgEl.tagName !== 'IMG') { prevSpeedForBrake = kmh; return; }
-  // نتحقق إنه فعلاً صورة السيارة (خصوصي/تكسي) — مو الدراجة أو أي سهم SVG
-  const isCarPhoto = arrowImgEl.src.includes('3868dj0lk0') || arrowImgEl.src.includes('3873p41y00');
-  if (!isCarPhoto) { prevSpeedForBrake = kmh; return; }
+  // نتحقق إنه فعلاً صورة سيارة (خصوصي أو تكسي) — مو الدراجة أو أي سهم SVG، ونحدد أي واحدة بالضبط
+  const isPrivateCar = arrowImgEl.src.includes('3868dj0lk0') || arrowImgEl.src.includes('3873p41y00');
+  const isTaxiCar    = arrowImgEl.src.includes('3878vo13t0') || arrowImgEl.src.includes('3878qiewx1');
+  if (!isPrivateCar && !isTaxiCar) { prevSpeedForBrake = kmh; return; }
 
   const stopped     = kmh <= 3;                        // متوقفة كلياً
   const decelerating = (prevSpeedForBrake - kmh) >= 2;  // أي تباطؤ ملحوظ (٢ كم/س فأكثر بين كل قراءتين)
@@ -1585,7 +1628,8 @@ function updateCarBrakeVisual(kmh) {
 
   if (shouldBrake !== brakeModeActive) {
     brakeModeActive = shouldBrake;
-    arrowImgEl.src = shouldBrake ? CAR_BRAKE_IMG_NAV : CAR_IMG_NAV;
+    const imgs = isTaxiCar ? { normal: CAR_IMG_TAXI, brake: CAR_BRAKE_IMG_TAXI } : { normal: CAR_IMG_PRIVATE, brake: CAR_BRAKE_IMG_PRIVATE };
+    arrowImgEl.src = shouldBrake ? imgs.brake : imgs.normal;
   }
   prevSpeedForBrake = kmh;
 }
@@ -1628,12 +1672,18 @@ function animateCarStep(ts) {
   }
 }
 
+const MIN_CAR_MOVE_M = 2; // أقل مسافة فعلية (متر) تستوجب تحريك أيقونة السيارة — أي تذبذب GPS أصغر من هذا وقت الوقوف يُتجاهل تماماً فتبقى السيارة ثابتة
 function moveCarSmoothly(toPos, toBearing, durMs) {
   const cur = arrowMkr ? arrowMkr.getLngLat() : null;
   const fromPos = cur ? [cur.lng, cur.lat] : toPos;
+  const distM = (fromPos !== toPos) ? metersBetween(fromPos, toPos) : 0;
 
-  // قفزة كبيرة غير طبيعية (استعادة GPS، تحميل مسار جديد...) → انتقال فوري بدون تحريك بصري
-  if (fromPos !== toPos && metersBetween(fromPos, toPos) > 80) {
+  // حركة دقيقة جداً (تذبذب طبيعي بقراءة GPS وقت الوقوف الفعلي) — نتجاهلها كلياً
+  // فتبقى السيارة ثابتة تماماً بمكانها، ولا تتحرك إلا بحركة قيادة فعلية
+  if (cur && distM > 0 && distM < MIN_CAR_MOVE_M) return;
+
+  // قفزة ضخمة فعلاً (فقدان إشارة GPS تماماً ثم استعادتها، أو تحميل مسار جديد) → انتقال فوري
+  if (distM > 200) {
     if (animRAF) cancelAnimationFrame(animRAF);
     animRAF = null;
     if (arrowMkr) arrowMkr.setLngLat(toPos);
@@ -1647,7 +1697,9 @@ function moveCarSmoothly(toPos, toBearing, durMs) {
   animFromBearing = curDisplayBearing;
   animToBearing   = toBearing;
   animStartTs     = 0;
-  animDurMs       = Math.max(150, Math.min(durMs || 500, 900));
+  // مدة الحركة تتبع الزمن الحقيقي الفاصل بين قراءتي GPS دائماً — بذلك السيارة تتحرك بخط مباشر
+  // وسلس مهما كانت المسافة، بدل ما تنطر (تتقطع) وتبان تقفز بين نقطة وأخرى.
+  animDurMs = Math.max(150, Math.min(durMs || 400, 1200));
   animRAF = requestAnimationFrame(animateCarStep);
 }
 
@@ -1779,7 +1831,7 @@ function buildStepList(steps, coords) {
     const s = steps[i];
     const name = (s.name || '').trim();
     if (!name) continue; // نتجاهل الشوارع بدون اسم
-    if (isNumericStreetName(name)) continue; // نتجاهل الأسماء الرقمية (محلة/زقاق برقم فقط)
+    if (isNumericStreetName(name)) continue; // نتجاهل أرقام المحلة/الزقاق — نريد اسم الشارع الحقيقي فقط
 
     const loc = s.maneuver && s.maneuver.location;
     if (!loc) continue;
@@ -2208,7 +2260,7 @@ function metersBetween(a, b) {
 // ══════════════════════════════════════════════
 
 const kalman = {
-  lng:null,lat:null,variance:-1,qMps:7,lastTime:0,
+  lng:null,lat:null,variance:-1,qMps:16,lastTime:0,
   process(lng,lat,acc,ts){
     if(this.variance<0){this.lng=lng;this.lat=lat;this.variance=acc*acc;this.lastTime=ts;return{lng,lat};}
     const dt=Math.max((ts-this.lastTime)/1000,0.001);this.lastTime=ts;
@@ -2221,12 +2273,12 @@ const kalman = {
 };
 let lastGPSTime=0,lastGPSPos=null;
 function filterGPS(lng,lat,acc,ts){
-  if(acc>150)return null;
+  if(acc>120)return null; // رفض القراءات الضعيفة جداً فقط — رفع الحد يقلل من تجاهل قراءات صالحة يسبب توقف/تقطع الموقع
   if(lastGPSPos){
     const dt=Math.max((ts-lastGPSTime)/1000,0.1);
     const dx=(lng-lastGPSPos[0])*111320*Math.cos(lat*Math.PI/180);
     const dy=(lat-lastGPSPos[1])*110540;
-    if(Math.sqrt(dx*dx+dy*dy)/dt>55)return null;
+    if(Math.sqrt(dx*dx+dy*dy)/dt>70)return null; // سرعة غير منطقية فقط (كانت 55، صارت 70 لتفادي رفض قراءات صحيحة بالطرق السريعة)
   }
   lastGPSPos=[lng,lat];lastGPSTime=ts;
   return kalman.process(lng,lat,Math.max(acc,5),ts);
@@ -2251,7 +2303,7 @@ function startGPS() {
       if (err.code === 1) showGPSError('يرجى السماح للتطبيق بالوصول إلى موقعك');
       else showGPSError('تعذّر تحديد موقعك، حاول مجدداً');
     },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 1000 }
   );
 
   restartGPSWatch();
@@ -2341,6 +2393,7 @@ function gotGPS(lng, lat, fallback=false) {
           geometry: { type: 'LineString', coordinates: remaining }
         });
       }
+      updateEtaBar(displayPos, maxRouteSeg); // تحديث حي للمسافة ووقت الوصول المتبقيين
     } else {
       // حيدت عن المسار — بعد عدة قراءات متتالية بعيدة (مو مجرد تذبذب GPS لحظي)
       // نطلب مسار جديد تلقائياً من موقعك الحالي إلى نفس الوجهة
@@ -2386,6 +2439,7 @@ function gotGPS(lng, lat, fallback=false) {
   } else {
     lastSpeedCalcPos = [lng, lat]; lastSpeedCalcTime = now;
   }
+  if (typeof evaluateAutoCongestion === 'function') evaluateAutoCongestion(lng, lat); // اكتشاف ازدحام تلقائي من سرعتك الفعلية
 
   if (routeReady) { checkNearTurn(lng, lat); checkNearReport(lng, lat); updateNextStreetBar(); updateLaneGuidance(lng, lat); }
 
@@ -2393,22 +2447,13 @@ function gotGPS(lng, lat, fallback=false) {
     map.flyTo({ center:[lng, lat], zoom:15, duration:800 });
   }
 
-  // تتبع الكاميرا — الكاميرا تنظر للأمام، السهم في الجزء السفلي من الشاشة
+  // تتبع الكاميرا — السيارة بمركز الشاشة بالضبط (بدون إزاحة للأمام)
   if (followMode && routeReady) {
-    const R2 = Math.PI/180;
-    // احسب إزاحة الكاميرا للأمام بناءً على الـ zoom الحالي
-    const zoom = map.getZoom() || 18.5;
-    const mpp = 156543.03392 * Math.cos(displayPos[1]*R2) / Math.pow(2, zoom);
-    // إزاحة 110م للأمام = السهم في الثلث السفلي من الشاشة
-    const offMeters = 110;
-    const offDeg = (offMeters * mpp) / 111320;
-    const fLng = displayPos[0] - Math.sin(newBearing*R2) * offDeg;
-    const fLat = displayPos[1] - Math.cos(newBearing*R2) * offDeg;
     map.easeTo({
-      center: [fLng, fLat],
+      center: displayPos,
       bearing: newBearing,
-      pitch: 72,
-      zoom: 18.5,
+      pitch: 62,
+      zoom: 17.3,
       duration: animDurMs,
       easing: t => t
     });
@@ -2541,6 +2586,8 @@ function applyRoute(route) {
   const mins   = Math.round(route.duration/60);
   currentRouteMins   = mins;
   currentRouteDistKm = dist;
+  totalRouteDistM      = route.distance;   // نستخدمها لحساب المسافة/الوقت المتبقيين بشكل حي أثناء السواقة
+  totalRouteDurationS  = route.duration;
 
   routeCoords = coords;
   maxRouteSeg = 0;
@@ -2676,10 +2723,10 @@ function showOverview(coords, bearing) {
     if(lng<minLng)minLng=lng; if(lng>maxLng)maxLng=lng;
     if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
   });
-  const pad = 0.014;
+  const pad = 0.03;
   map.fitBounds(
     [[minLng-pad, minLat-pad],[maxLng+pad, maxLat+pad]],
-    { pitch:0, bearing:0, duration:800, padding:{top:60,bottom:260,left:40,right:40}, essential:true }
+    { pitch:0, bearing:0, duration:800, padding:{top:80,bottom:280,left:50,right:50}, maxZoom:15, essential:true }
   );
   const card = document.getElementById('overviewCard');
   card.style.display = 'flex'; card.style.flexDirection = 'column';
@@ -2699,6 +2746,7 @@ function startNavigation() {
   primeAudioElements(); // يعيد "تجهيز" ملف صوت الانعطاف قبل بدء الرحلة مباشرة
   setRouteThick();
   document.getElementById('speedHUD').style.display = 'flex';
+  document.getElementById('etaBar').classList.add('show'); // إظهار شريط المسافة/الوقت المتبقيين فوراً عند الانطلاق
   const p0 = routeCoords[0];
   const p1 = routeCoords[Math.min(3, routeCoords.length-1)];
   const b  = calcBearing(p0, p1);
@@ -2718,13 +2766,8 @@ function startNavigation() {
   }
   curDisplayBearing = 0;
 
-  // ── تحريك الكاميرا للأمام بحيث السهم يكون في الثلث السفلي ──
-  const RAD = Math.PI/180;
-  const mpp2 = 156543.03392*Math.cos(p0[1]*RAD)/Math.pow(2,18.5);
-  const offDeg2 = (120*mpp2)/111320;
-  const camLng = p0[0] - Math.sin(b*RAD)*offDeg2;
-  const camLat = p0[1] - Math.cos(b*RAD)*offDeg2;
-  map.flyTo({ center:[camLng,camLat], zoom:18.5, pitch:72, bearing:b, duration:1200, essential:true });
+  // ── الكاميرا تتمركز على السيارة بالضبط (بدون إزاحة للأمام) ──
+  map.flyTo({ center:p0, zoom:17.3, pitch:62, bearing:b, duration:1200, essential:true });
 
   // ── إظهار زر "نظرة عامة على المسار" أثناء الملاحة فقط ──
   routeOverviewMode = false;
@@ -2754,10 +2797,10 @@ function toggleRouteOverview() {
         if(lng<minLng)minLng=lng; if(lng>maxLng)maxLng=lng;
         if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
       });
-      const pad = 0.006;
+      const pad = 0.02;
       map.fitBounds(
         [[minLng-pad, minLat-pad],[maxLng+pad, maxLat+pad]],
-        { pitch:0, bearing:0, duration:600, padding:{top:60,bottom:220,left:40,right:40}, essential:true }
+        { pitch:0, bearing:0, duration:600, padding:{top:70,bottom:240,left:45,right:45}, maxZoom:15, essential:true }
       );
     }
   } else {
@@ -2766,13 +2809,7 @@ function toggleRouteOverview() {
     setRouteThick();
     if (arrowMkr) {
       const pos = arrowMkr.getLngLat();
-      const R4 = Math.PI/180;
-      const zoom4 = 18.5;
-      const mpp4 = 156543.03392 * Math.cos(pos.lat*R4) / Math.pow(2, zoom4);
-      const offDeg4 = (110 * mpp4) / 111320;
-      const fLng = pos.lng - Math.sin(curBearing*R4) * offDeg4;
-      const fLat = pos.lat - Math.cos(curBearing*R4) * offDeg4;
-      map.flyTo({ center:[fLng,fLat], zoom:18.5, pitch:72, bearing:curBearing, duration:700 });
+      map.flyTo({ center:[pos.lng, pos.lat], zoom:17.3, pitch:62, bearing:curBearing, duration:700 });
     }
   }
 }
@@ -2858,6 +2895,43 @@ document.getElementById('searchOverlay').onclick = () => {
   closeConfirmCard();
 };
 
+// ══════════════════════════════════════════════
+// سحب لوحة البحث (ابحث عن وجهتك) للأسفل بالإصبع لإغلاقها — من أي مكان فاضي باللوحة أو من المقبض
+// ══════════════════════════════════════════════
+(function initSheetSwipeToClose(panelId, closeFn) {
+  const panel = document.getElementById(panelId);
+  let startY = 0, curY = 0, dragging = false, startedOnScrollable = false;
+
+  panel.addEventListener('touchstart', (e) => {
+    // إذا بدأ السحب من داخل عنصر قابل للتمرير (نتائج البحث) وهو ليس بأعلى اللفة، نتجاهل حتى لا نتعارض مع تمرير القائمة
+    const scrollable = e.target.closest('#spResults, #favSection');
+    startedOnScrollable = !!(scrollable && scrollable.scrollTop > 0);
+    startY = curY = e.touches[0].clientY;
+    dragging = true;
+    panel.style.transition = 'none';
+  }, { passive: true });
+
+  panel.addEventListener('touchmove', (e) => {
+    if (!dragging || startedOnScrollable) return;
+    curY = e.touches[0].clientY;
+    const dy = curY - startY;
+    if (dy <= 0) return; // نسمح بالسحب للأسفل فقط
+    panel.style.transform = `translateY(${dy}px)`;
+  }, { passive: true });
+
+  panel.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    panel.style.transition = '';
+    const dy = curY - startY;
+    if (!startedOnScrollable && dy > 90) {
+      closeFn(); // سحب كافٍ للأسفل → إغلاق اللوحة فعلياً
+    }
+    panel.style.transform = ''; // نرجّع الترانسفورم اليدوي — الإغلاق نفسه يتولاه closeFn عبر كلاس show
+  });
+})('searchPanel', closeSearchPanel);
+
+
 spInput.addEventListener('input', () => {
   clearTimeout(searchTimer);
   const q = spInput.value.trim();
@@ -2875,11 +2949,33 @@ spClear.onclick = () => {
 
 async function doSearch(q) {
   try {
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q+' العراق')}&format=json&limit=6&accept-language=ar`;
-    const r   = await fetch(url, { headers:{'Accept-Language':'ar'} });
-    const arr = await r.json();
+    let viewbox;
+    if (userPos) {
+      const [lng, lat] = userPos;
+      const d = 0.6; // نطاق واسع (~65 كم) حول موقعك الحالي لترجيح النتائج القريبة أولاً
+      viewbox = `${lng - d},${lat + d},${lng + d},${lat - d}`;
+    }
+    // نفس أسلوب البحث الاحتياطي المستخدم بالتنقل الصوتي — نجرب عدة صيغ من الأكثر
+    // تحديداً للأكثر مرونة، لأن مناطق ومحلات كثيرة بالعراق مو مسجلة بنفس الاسم
+    // أو تحتاج صيغة مختلفة بقاعدة بيانات OpenStreetMap
+    const attempts = [
+      { q: q + ' العراق', countrycodes: 'iq', viewbox, limit: 6 },
+      { q, countrycodes: 'iq', viewbox, limit: 6 },
+      { q: q + ' العراق', countrycodes: 'iq', limit: 6 },
+      { q, countrycodes: 'iq', limit: 6 },
+      { q, limit: 6 }
+    ];
+
+    let arr = [];
+    for (const a of attempts) {
+      try {
+        arr = await nominatimSearch(a.q, a);
+        if (arr && arr.length) break;
+      } catch (e) { /* نتجاهل ونجرب المحاولة التالية */ }
+    }
+
     spResults.innerHTML = '';
-    if (!arr.length) {
+    if (!arr || !arr.length) {
       spResults.innerHTML = '<div class="sp-empty">لا توجد نتائج، جرب كلمة أخرى</div>'; return;
     }
     arr.forEach(item => {
@@ -3056,8 +3152,6 @@ document.getElementById('btn3D').onclick = function() {
     : { pitch:0,  bearing:0,          duration:600 });
 };
 
-document.getElementById('btnZoomIn').onclick  = () => map.zoomIn();
-document.getElementById('btnZoomOut').onclick = () => map.zoomOut();
 
 function clearRoute() {
   if (destMkr) { destMkr.remove(); destMkr=null; }
@@ -3086,6 +3180,7 @@ function clearRoute() {
   document.getElementById('rovIcon').setAttribute('data-lucide','route');
   lucide.createIcons();
   document.getElementById('speedHUD').style.display = 'none';
+  document.getElementById('etaBar').classList.remove('show');
   if (userPos) map.flyTo({ center:userPos, zoom:14, pitch:0, bearing:0, duration:600 });
 }
 
@@ -3098,13 +3193,7 @@ document.getElementById('btnFollow').onclick = function() {
   lucide.createIcons();
   if (followMode && arrowMkr) {
     const pos = arrowMkr.getLngLat();
-    const R3 = Math.PI/180;
-    const zoom = map.getZoom() || 18.5;
-    const mpp3 = 156543.03392 * Math.cos(pos.lat*R3) / Math.pow(2, zoom);
-    const offDeg3 = (110 * mpp3) / 111320;
-    const fLng = pos.lng - Math.sin(curBearing*R3) * offDeg3;
-    const fLat = pos.lat - Math.cos(curBearing*R3) * offDeg3;
-    map.flyTo({ center:[fLng,fLat], zoom:18.5, pitch:72, bearing:curBearing, duration:700 });
+    map.flyTo({ center:[pos.lng, pos.lat], zoom:17.3, pitch:62, bearing:curBearing, duration:700 });
   }
 };
 
@@ -3227,7 +3316,6 @@ function toggleTrafficLegend(show) {
 // ══════════════════════════════════════════════
 // ARROW STYLE PICKER (من الإعدادات)
 // ══════════════════════════════════════════════
-document.getElementById('stgCarStyleSub').textContent = (ARROW_STYLES[savedArrowStyleIdx] || ARROW_STYLES[0]).name;
 
 const carStyleGrid = document.getElementById('carStyleGrid');
 function renderCarStyleGrid() {
@@ -3235,13 +3323,11 @@ function renderCarStyleGrid() {
   carStyleGrid.innerHTML = '';
   ARROW_STYLES.forEach((s, i) => {
     const b = document.createElement('button');
-    b.title = s.name;
     b.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:2px solid ${i===activeIdx?'#22c55e':'rgba(255,255,255,0.12)'};border-radius:14px;padding:12px 6px;cursor:pointer;`;
-    b.innerHTML = `<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;overflow:hidden;"><span style="display:contents;" class="carPrevIcon">${s.svg}</span></span><span style="font-size:11px;color:#cbd5e1;">${s.name}</span>`;
+    b.innerHTML = `<span style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;overflow:hidden;"><span style="display:contents;" class="carPrevIcon">${s.svg}</span></span>`;
     b.onclick = () => {
       applyArrowStyle(s.svg);
       localStorage.setItem('sqoor_car_style', String(i));
-      document.getElementById('stgCarStyleSub').textContent = s.name;
       [...carStyleGrid.children].forEach(x => x.style.borderColor = 'rgba(255,255,255,0.12)');
       b.style.borderColor = '#22c55e';
     };
@@ -3257,26 +3343,33 @@ let reports = [];
 
 const REPORT_TYPES = [
   { id:'jam', name:'ازدحام', color:'#f97316', alertDist:200, alertText:'تنبيه، ازدحام أمامك',
-    icon:'fa-solid fa-traffic-light' },
+    img:'https://e.top4top.io/p_3878nmsha0.png' },
   { id:'accident', name:'حادث', color:'#ef4444', alertDist:250, alertText:'تنبيه، حادث أمامك',
-    icon:'fa-solid fa-car-burst' },
+    img:'https://i.top4top.io/p_3878lj0zs2.png' },
   { id:'closed', name:'قطع طريق', color:'#64748b', alertDist:250, alertText:'تنبيه، الطريق مقطوع أمامك',
-    icon:'fa-solid fa-road-barrier' },
+    icon:'construction' },
   { id:'radar', name:'رادار سرعة', color:'#a855f7', alertDist:350, alertText:'تنبيه، رادار سرعة أمامك',
-    icon:'fa-solid fa-camera' },
+    img:'https://b.top4top.io/p_38784xcdo0.png' },
   { id:'bump', name:'مطب', color:'#eab308', alertDist:130, alertText:'تنبيه، مطب أمامك',
-    icon:'fa-solid fa-hill-rockslide' },
+    icon:'waves' },
   { id:'sharp_turn', name:'منعطف حاد', color:'#f43f5e', alertDist:180, alertText:'تنبيه، منعطف حاد أمامك',
-    icon:'fa-solid fa-diamond-turn-right' },
+    icon:'corner-up-right' },
+  { id:'excavation', name:'حفريات', color:'#92400e', alertDist:200, alertText:'تنبيه، حفريات أمامك',
+    img:'https://g.top4top.io/p_3878wdti30.png' },
+  { id:'rough_road', name:'طريق غير منتظم لتخفيف السرعة', color:'#0ea5e9', alertDist:150, alertText:'تنبيه، طريق غير منتظم أمامك',
+    img:'https://h.top4top.io/p_387847t3v1.png' },
 ];
 
 const reportOptions = document.getElementById('reportOptions');
 REPORT_TYPES.forEach(t => {
   const b = document.createElement('button');
-  b.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:12px;border:1px solid ${t.color}66;background:${t.color}22;color:${t.color};font-family:'Cairo',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:background .15s;text-align:center;`;
-  b.onmouseenter = () => b.style.background = `${t.color}38`;
-  b.onmouseleave = () => b.style.background = `${t.color}22`;
-  b.innerHTML = `<span style="display:flex;width:26px;height:26px;border-radius:50%;background:${t.color};align-items:center;justify-content:center;flex-shrink:0;"><i class="${t.icon}" style="font-size:13px;color:#fff;"></i></span> ${t.name}`;
+  b.style.cssText = `display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 6px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#e2e8f0;font-family:'Cairo',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;transition:background .15s;text-align:center;`;
+  b.onmouseenter = () => b.style.background = 'rgba(255,255,255,0.09)';
+  b.onmouseleave = () => b.style.background = 'rgba(255,255,255,0.04)';
+  const iconHtml = t.img
+    ? `<img src="${t.img}" style="width:26px;height:26px;object-fit:contain;flex-shrink:0;" draggable="false" />`
+    : `<span style="display:flex;width:26px;height:26px;border-radius:50%;background:${t.color};align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="${t.icon}" style="width:14px;height:14px;color:#fff;"></i></span>`;
+  b.innerHTML = `${iconHtml} ${t.name}`;
   b.onclick = () => {
     document.getElementById('reportPanel').style.display = 'none';
     document.getElementById('btnReport').classList.remove('on');
@@ -3284,6 +3377,7 @@ REPORT_TYPES.forEach(t => {
   };
   reportOptions.appendChild(b);
 });
+lucide.createIcons();
 
 document.getElementById('btnReport').onclick = function() {
   const panel = document.getElementById('reportPanel');
@@ -3316,8 +3410,13 @@ document.getElementById('reportPickCancel').onclick = cancelReportPick;
 
 function makeReportEl(type) {
   const d = document.createElement('div');
-  d.style.cssText = `width:36px;height:36px;border-radius:50%;background:${type.color};display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.55),0 0 0 3px rgba(255,255,255,0.18);`;
-  d.innerHTML = `<i class="${type.icon}" style="font-size:15px;color:#fff;"></i>`;
+  d.style.cssText = `width:50px;height:50px;display:flex;align-items:center;justify-content:center;cursor:pointer;`;
+  if (type.img) {
+    d.innerHTML = `<img src="${type.img}" style="width:50px;height:50px;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.65));" draggable="false" />`;
+  } else {
+    d.innerHTML = `<i data-lucide="${type.icon}" style="width:36px;height:36px;color:${type.color};filter:drop-shadow(0 3px 6px rgba(0,0,0,0.75));"></i>`;
+    lucide.createIcons({ nameAttr: 'data-lucide', root: d });
+  }
   return d;
 }
 
@@ -3326,6 +3425,7 @@ function placeReport(type, lngLat) {
   const mkr = new maplibregl.Marker({ element: el, anchor:'center' }).setLngLat(lngLat).addTo(map);
   const entry = { type, lngLat, time: Date.now(), mkr, announced:false };
   reports.push(entry);
+  pushCongestionReportToFirebase(type, lngLat); // إذا كان بلاغ ازدحام، يترفع لقاعدة بيانات مشتركة يشوفها كل المستخدمين
 
   el.onclick = (ev) => {
     ev.stopPropagation();
@@ -3808,20 +3908,13 @@ document.getElementById('speedHUD').onclick = () => {
 };
 
 // ══════════════════════════════════════════════
-// MORE PANEL (الإعدادات)
-// ══════════════════════════════════════════════
-document.getElementById('btnMore').onclick = function() {
-  const panel = document.getElementById('morePanel');
-  const on = panel.style.display === 'flex';
-  panel.style.display = on ? 'none' : 'flex';
-  this.classList.toggle('on', !on);
-};
-
-// ══════════════════════════════════════════════
 // مشاركة الموقع عبر التطبيق (حي + إرسال لمرة واحدة)
 // ══════════════════════════════════════════════
 
-// ⚠️ عبّي بيانات مشروع Firebase الخاص فيك هنا حتى يشتغل زر «مشاركة الموقع الحي»
+// نصف قطر البحث عن الازدحام حول موقع المستخدم (بالمتر) — يُستخدم مع بلاغات Firebase (اليدوية + التلقائية من السرعة)
+const CONGESTION_SEARCH_RADIUS_M = 3000;
+
+// ⚠️ عبّي بيانات مشروع Firebase الخاص فيك هنا حتى يشتغل زر «مشاركة الموقع الحي» ونظام بلاغات الازدحام (اليدوية والتلقائية)
 const firebaseConfig = {
   apiKey: "PUT_API_KEY_HERE",
   authDomain: "PUT_AUTH_DOMAIN_HERE",
@@ -3962,9 +4055,30 @@ function formatArrivalTime(mins) {
   return d.toLocaleTimeString('ar-IQ', { hour:'2-digit', minute:'2-digit' });
 }
 
+// يحسب المسافة والوقت المتبقيين فعلياً من موقعك الحالي (وليس إجمالي المسار الثابت) ويحدّث الشريط العلوي
+function updateEtaBar(displayPos, segIdx) {
+  const bar = document.getElementById('etaBar');
+  if (!routeReady || !routeCoords || segIdx == null) { bar.classList.remove('show'); return; }
+
+  // نجمع المسافة المتبقية من موقعك الحالي (النقطة الملتصقة بالمسار) حتى نهاية المسار
+  let remM = metersBetween(displayPos, routeCoords[Math.min(segIdx + 1, routeCoords.length - 1)]);
+  for (let i = segIdx + 1; i < routeCoords.length - 1; i++) {
+    remM += metersBetween(routeCoords[i], routeCoords[i + 1]);
+  }
+
+  const remKm = remM / 1000;
+  // نستخدم متوسط سرعة المسار الكلي (من OSRM) لتقدير الوقت المتبقي بدقة معقولة
+  const avgMps = totalRouteDurationS > 0 ? (totalRouteDistM / totalRouteDurationS) : null;
+  const remMins = avgMps ? Math.max(1, Math.round((remM / avgMps) / 60)) : currentRouteMins;
+
+  document.getElementById('etaDist').textContent = remKm < 1 ? Math.round(remM) + ' م' : remKm.toFixed(1) + ' كم';
+  document.getElementById('etaMins').textContent  = remMins;
+  document.getElementById('etaTime').textContent  = formatArrivalTime(remMins);
+  bar.classList.add('show');
+}
+
 document.getElementById('btnShareTrip').onclick = () => {
-  document.getElementById('morePanel').style.display = 'none';
-  document.getElementById('btnMore').classList.remove('on');
+  closeSettings();
   if (!userPos) { showGPSToast('جاري تحديد موقعك...'); setTimeout(hideGPSToast, 1500); return; }
   if (!routeReady || currentRouteMins == null) { showGPSToast('لا يوجد مسار قائم حالياً'); setTimeout(hideGPSToast, 1500); return; }
 
@@ -4013,9 +4127,12 @@ function restartGPSWatch() {
   if (watchId !== null && navigator.geolocation) {
     navigator.geolocation.clearWatch(watchId);
   }
+  // نبقي enableHighAccuracy فعّال دائماً حتى بوضع توفير البطارية — الدقة أهم من التوفير الطفيف بالبطارية
+  // maximumAge لا يساوي صفر حتى مع تعطيل توفير البطارية — إجبار الجهاز على قراءة GPS
+  // جديدة كلياً بكل نبضة يسبب تأخير/توقف عشوائي بشرائح GPS كثيرة فيبان الموقع يتقطع
   const opts = batterySaver
-    ? { enableHighAccuracy:false, maximumAge:4000, timeout:15000 }
-    : { enableHighAccuracy:true,  maximumAge:0 };
+    ? { enableHighAccuracy:true, maximumAge:2000, timeout:15000 }
+    : { enableHighAccuracy:true, maximumAge:800, timeout:15000 };
   watchId = navigator.geolocation.watchPosition(
     p => {
       const f = filterGPS(p.coords.longitude, p.coords.latitude, p.coords.accuracy||20, p.timestamp);
@@ -4029,8 +4146,8 @@ function restartGPSWatch() {
 // ══════════════════════════════════════════════
 // لوحة الإعدادات (الحساب / الخصوصية / المفضلة)
 // ══════════════════════════════════════════════
-const stgViews = ['main','account','privacy','favorites','routeColor','carStyle'];
-const stgTitles = { main:'الإعدادات', account:'الحساب', privacy:'الخصوصية', favorites:'الأماكن المفضلة', routeColor:'لون خط المسار', carStyle:'شكل السهم' };
+const stgViews = ['main','account','privacy','favorites','routeColor','carStyle','more'];
+const stgTitles = { main:'الإعدادات', account:'الحساب', privacy:'الخصوصية', favorites:'الأماكن المفضلة', routeColor:'لون خط المسار', carStyle:'شكل السهم', more:'المزيد' };
 
 function openSettings() {
   const panel = document.getElementById('settingsPanel');
@@ -4060,6 +4177,53 @@ function showStgView(name) {
   if (name === 'favorites') renderStgFavorites();
 }
 document.getElementById('btnSettings').onclick = openSettings;
+
+// ══════════════════════════════════════════════
+// سحب الأزرار الجانبية (بحث/إعدادات/إشعارات/موقعي) للأسفل بالإصبع لإخفائها، ومقبض صغير لإرجاعها
+// ══════════════════════════════════════════════
+(function initSideButtonsSwipe() {
+  const box    = document.getElementById('sideButtons');
+  const handle = document.getElementById('sideButtonsHandle');
+  let startY = 0, curY = 0, dragging = false;
+
+  box.addEventListener('touchstart', (e) => {
+    startY = curY = e.touches[0].clientY;
+    dragging = true;
+    box.style.transition = 'none';
+  }, { passive: true });
+
+  box.addEventListener('touchmove', (e) => {
+    if (!dragging) return;
+    curY = e.touches[0].clientY;
+    const dy = Math.max(0, curY - startY); // نسمح بالسحب للأسفل فقط
+    box.style.transform = `translateY(${dy}px)`;
+    box.style.opacity   = String(Math.max(0.25, 1 - dy / 160));
+  }, { passive: true });
+
+  box.addEventListener('touchend', () => {
+    if (!dragging) return;
+    dragging = false;
+    box.style.transition = '';
+    const dy = curY - startY;
+    if (dy > 55) {
+      // سحب كافٍ للأسفل → نخفي الأزرار ونظهر المقبض الصغير بدلها
+      box.style.transform = '';
+      box.style.opacity   = '';
+      box.classList.add('hidden-swipe');
+      handle.classList.add('show');
+    } else {
+      // سحب غير كافٍ → نرجّع الأزرار لمكانها
+      box.style.transform = '';
+      box.style.opacity   = '';
+    }
+  });
+
+  handle.onclick = () => {
+    box.classList.remove('hidden-swipe');
+    handle.classList.remove('show');
+  };
+})();
+
 document.getElementById('stgCloseBtn').onclick = closeSettings;
 document.getElementById('stgBackBtn').onclick = () => showStgView('main');
 document.getElementById('stgOpenAccount').onclick   = () => showStgView('account');
@@ -4067,6 +4231,7 @@ document.getElementById('stgOpenPrivacy').onclick   = () => showStgView('privacy
 document.getElementById('stgOpenFavorites').onclick = () => showStgView('favorites');
 document.getElementById('stgOpenRouteColor').onclick = () => showStgView('routeColor');
 document.getElementById('stgOpenCarStyle').onclick   = () => showStgView('carStyle');
+document.getElementById('stgOpenMore').onclick       = () => showStgView('more');
 
 document.getElementById('acctSaveBtn').onclick = () => {
   const name  = document.getElementById('acctName').value.trim();
@@ -4126,6 +4291,7 @@ function savePrivacy() {
   privacySettings.trafficColor = document.getElementById('privTrafficColor').checked;
   localStorage.setItem('sqoor_privacy', JSON.stringify(privacySettings));
   congestionEnabled = privacySettings.congestion;
+  if (!congestionEnabled && typeof clearCongestionLayer === 'function') clearCongestionLayer(); // نمسح الماركرات فوراً عند الإيقاف
   trafficColorEnabled = privacySettings.trafficColor;
   if (routeReady && routeCoords) {
     if (trafficColorEnabled) applyTrafficColoring(routeCoords);
@@ -4162,20 +4328,289 @@ function pushCongestionAlert(area, level) {
   if (voiceEnabled) speak(`تنبيه، ${level.label} في ${area}`);
 }
 
-// يولّد تنبيه ازدحام تجريبي بالقرب من موقع المستخدم (محاكاة بانتظار ربط مصدر بيانات ازدحام حي)
-async function simulateCongestionCheck() {
-  if (!congestionEnabled || !userPos) return;
-  const distM = 400 + Math.random() * 2200;
-  const ang   = Math.random() * 2 * Math.PI;
-  const dLng  = (Math.sin(ang) * distM) / (111320 * Math.cos(userPos[1]*Math.PI/180));
-  const dLat  = (Math.cos(ang) * distM) / 110540;
-  const lng = userPos[0] + dLng, lat = userPos[1] + dLat;
-  const level = CONGESTION_LEVELS[Math.floor(Math.random() * CONGESTION_LEVELS.length)];
-  const area = await reverseGeocodeStreetArea(lng, lat);
-  pushCongestionAlert(area, level);
+// ══════════════════════════════════════════════
+// مصدر بيانات الازدحام: Firebase (بلاغات المستخدمين اليدوية + الاكتشاف التلقائي من سرعة السواقة)
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// مصدر 2 (احتياطي): بلاغات ازدحام حقيقية من المستخدمين أنفسهم عبر Firebase
+// ══════════════════════════════════════════════
+const CONGESTION_REPORT_TTL_MS = 45 * 60 * 1000; // البلاغ يفقد قيمته بعد 45 دقيقة
+
+function pushCongestionReportToFirebase(type, lngLat) {
+  if (type.id !== 'jam') return; // فقط بلاغات "ازدحام" ترفع لهذا النظام
+  const db = getFirebaseDb();
+  if (!db) return; // Firebase غير مُعد بعد
+  const id = genShareId();
+  db.ref('congestionReports/' + id).set({ lat: lngLat[1], lng: lngLat[0], ts: Date.now() });
+  setTimeout(() => { db.ref('congestionReports/' + id).remove(); }, CONGESTION_REPORT_TTL_MS);
+}
+
+async function fetchFirebaseCongestionNear(lat, lng, radiusM) {
+  const db = getFirebaseDb();
+  if (!db) return [];
+  try {
+    const snap = await db.ref('congestionReports').once('value');
+    const val = snap.val() || {};
+    const now = Date.now();
+    const nearby = [];
+    Object.values(val).forEach(rep => {
+      if (!rep || now - rep.ts > CONGESTION_REPORT_TTL_MS) return;
+      const dx = (rep.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
+      const dy = (rep.lat - lat) * 110540;
+      if (Math.sqrt(dx * dx + dy * dy) <= radiusM) nearby.push({ lat: rep.lat, lng: rep.lng });
+    });
+    return nearby;
+  } catch (e) {
+    console.error('Firebase congestion fetch failed', e);
+    return [];
+  }
+}
+
+// نجمع البلاغات القريبة من بعضها بنفس النقطة، لأن كثرة البلاغات بنفس المكان تعني ازدحام أشد
+function clusterFirebaseReports(nearby) {
+  const clusters = [];
+  nearby.forEach(rep => {
+    const c = clusters.find(cl => {
+      const dx = (cl.lng - rep.lng) * 111320 * Math.cos(rep.lat * Math.PI / 180);
+      const dy = (cl.lat - rep.lat) * 110540;
+      return Math.sqrt(dx * dx + dy * dy) < 250;
+    });
+    if (c) c.count++; else clusters.push({ lat: rep.lat, lng: rep.lng, count: 1 });
+  });
+  return clusters.sort((a, b) => b.count - a.count);
+}
+function reportCountToLevel(count) {
+  if (count >= 4) return CONGESTION_LEVELS[0];
+  if (count >= 2) return CONGESTION_LEVELS[1];
+  return CONGESTION_LEVELS[2];
+}
+
+// ══════════════════════════════════════════════
+// اكتشاف الازدحام تلقائياً من سرعة السواقة الفعلية بالشوارع الرئيسية (بدون أي ضغط زر من المستخدم)
+// الفكرة: نقارن سرعتك الفعلية بالسرعة الطبيعية لنوع الشارع (motorway/trunk/primary...)،
+// وإذا كانت أبطأ بكثير ولفترة مستمرة (مو مجرد إشارة حمراء لحظية) نعتبره ازدحام حقيقي ونرفعه تلقائياً لـ Firebase
+// ══════════════════════════════════════════════
+const MAIN_ROAD_TYPES = ['motorway', 'trunk', 'primary', 'secondary', 'motorway_link', 'trunk_link', 'primary_link'];
+const EXPECTED_FREEFLOW_KMH = {
+  motorway: 100, motorway_link: 60,
+  trunk: 90,      trunk_link: 55,
+  primary: 70,    primary_link: 50,
+  secondary: 60
+};
+const AUTO_CONGESTION_RATIO        = 0.4;   // إذا سرعتك أقل من 40% من السرعة الطبيعية للشارع = ازدحام
+const AUTO_CONGESTION_MIN_SPAN_MS  = 25000; // لازم البطء يستمر 25 ثانية على الأقل حتى لا نغلط ونعتبر إشارة مرور ازدحاماً
+const AUTO_CONGESTION_COOLDOWN_MS  = 5 * 60 * 1000; // ما نكرر رفع بلاغ تلقائي لنفس المنطقة كل أقل من 5 دقائق
+
+let autoSpeedSamples    = [];               // [{ts, kmh}] آخر عينات سرعة
+let autoRoadCache       = { ts: 0, lng: null, lat: null, type: null };
+const autoLastReportByCell = new Map();     // منع تكرار الرفع التلقائي لنفس المنطقة بفترة قصيرة
+const activeAutoReports    = new Map();     // key(منطقة) -> { id: معرف البلاغ بـ Firebase, timeoutId } — الازدحامات التلقائية الشغالة حالياً
+
+function pushAutoSpeedSample(kmh) {
+  const now = Date.now();
+  autoSpeedSamples.push({ ts: now, kmh });
+  autoSpeedSamples = autoSpeedSamples.filter(s => now - s.ts <= 40000); // نحتفظ بآخر 40 ثانية فقط
+}
+
+// نجيب تصنيف الشارع الحالي (رئيسي/فرعي) من OpenStreetMap، مع تخزين مؤقت لتفادي إغراق الخدمة بالطلبات
+async function getRoadTypeAt(lng, lat) {
+  const now = Date.now();
+  if (autoRoadCache.type !== undefined && autoRoadCache.type !== null && now - autoRoadCache.ts < 25000) {
+    const dx = (autoRoadCache.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
+    const dy = (autoRoadCache.lat - lat) * 110540;
+    if (Math.sqrt(dx * dx + dy * dy) < 150) return autoRoadCache.type;
+  }
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=17`);
+    const d = await r.json();
+    const type = (d && d.category === 'highway') ? d.type : null;
+    autoRoadCache = { ts: now, lng, lat, type };
+    return type;
+  } catch { return null; }
+}
+
+// نلقى أقرب منطقة ازدحام تلقائي شغالة حالياً لموقعك، إذا كانت قريبة كفاية (بنفس المنطقة تقريباً)
+function nearestActiveAutoCell(lat, lng, maxDistM) {
+  let bestKey = null, bestDist = Infinity;
+  activeAutoReports.forEach((entry, key) => {
+    const [gy, gx] = key.split('_').map(Number);
+    const cLat = gy * CONGESTION_GRID_DEG, cLng = gx * CONGESTION_GRID_DEG;
+    const dx = (cLng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
+    const dy = (cLat - lat) * 110540;
+    const d = Math.sqrt(dx * dx + dy * dy);
+    if (d < maxDistM && d < bestDist) { bestDist = d; bestKey = key; }
+  });
+  return bestKey;
+}
+
+// ينهي بلاغ ازدحام تلقائي فوراً: يحذفه من Firebase ومن الخريطة، ويسمح باكتشاف ازدحام جديد بنفس المنطقة لاحقاً
+function removeAutoReport(key) {
+  const entry = activeAutoReports.get(key);
+  if (!entry) return;
+  clearTimeout(entry.timeoutId);
+  const db = getFirebaseDb();
+  if (db) db.ref('congestionReports/' + entry.id).remove();
+  activeAutoReports.delete(key);
+  autoLastReportByCell.delete(key);
+  const m = congestionMarkers.get(key);
+  if (m) { m.marker.remove(); congestionMarkers.delete(key); }
+}
+
+// يفحص هل سرعتك الحالية أبطأ بكثير من الطبيعي بشارع رئيسي، وإذا استمر لفترة كافية يرفع بلاغ ازدحام تلقائي حقيقي
+// وبعكسه: إذا وصلت منطقة ازدحام مسجّلة سابقاً وزادت سرعتك للطبيعي، نعتبر الازدحام انتهى ونحذفه فوراً
+async function evaluateAutoCongestion(lng, lat) {
+  if (!congestionEnabled) return;
+  pushAutoSpeedSample(lastSpeedKmh);
+  if (autoSpeedSamples.length < 4) return; // نحتاج عدة قراءات متتالية أولاً
+  if (Date.now() - autoSpeedSamples[0].ts < AUTO_CONGESTION_MIN_SPAN_MS) return;
+
+  const avgKmh = autoSpeedSamples.reduce((s, x) => s + x.kmh, 0) / autoSpeedSamples.length;
+
+  // ── سرعتك رجعت طبيعية داخل منطقة كنا قد سجلنا فيها ازدحاماً تلقائياً سابقاً → الزحمة انتهت فعلاً، نحذفها فوراً ──
+  if (avgKmh > 45 && activeAutoReports.size) {
+    const clearedKey = nearestActiveAutoCell(lat, lng, 400);
+    if (clearedKey) removeAutoReport(clearedKey);
+  }
+
+  if (avgKmh > 45) return; // سرعة طبيعية أصلاً، ما فيه داعي نفحص نوع الطريق لازدحام جديد
+
+  const roadType = await getRoadTypeAt(lng, lat);
+  if (!roadType || !MAIN_ROAD_TYPES.includes(roadType)) return; // نكتشف فقط بالشوارع الرئيسية كما طلبت
+
+  const expected = EXPECTED_FREEFLOW_KMH[roadType] || 60;
+  const ratio = avgKmh / expected;
+  if (ratio >= AUTO_CONGESTION_RATIO) return; // سرعتك طبيعية نسبياً مقارنة بهذا الشارع، ما فيه ازدحام
+
+  const key = congestionKey(lat, lng);
+  const level = ratio < 0.2 ? CONGESTION_LEVELS[0] : ratio < 0.32 ? CONGESTION_LEVELS[1] : CONGESTION_LEVELS[2];
+
+  if (activeAutoReports.has(key)) {
+    // الزحمة بنفس المنطقة لسا مستمرة — نمدد وقت انتهائها ونحدّث شدتها بدل ما نكرر بلاغ جديد
+    const entry = activeAutoReports.get(key);
+    clearTimeout(entry.timeoutId);
+    entry.timeoutId = setTimeout(() => removeAutoReport(key), CONGESTION_REPORT_TTL_MS);
+    upsertCongestionMarker(lat, lng, level);
+    return;
+  }
+
+  const lastReport = autoLastReportByCell.get(key) || 0;
+  if (Date.now() - lastReport < AUTO_CONGESTION_COOLDOWN_MS) return;
+  autoLastReportByCell.set(key, Date.now());
+
+  upsertCongestionMarker(lat, lng, level); // نعرضها فوراً على الخريطة بدون انتظار الفحص الدوري
+
+  const db = getFirebaseDb();
+  if (db) {
+    const id = genShareId();
+    db.ref('congestionReports/' + id).set({ lat, lng, ts: Date.now(), auto: true });
+    const timeoutId = setTimeout(() => removeAutoReport(key), CONGESTION_REPORT_TTL_MS);
+    activeAutoReports.set(key, { id, timeoutId });
+  }
+}
+
+// نتجنب تكرار نفس التنبيه الصوتي/الإشعار لنفس النقطة خلال فترة قصيرة (الماركر نفسه يبقى ظاهر دائماً بغض النظر)
+const recentlyAlertedPoints = [];
+function alreadyAlertedNear(lat, lng) {
+  const now = Date.now();
+  return recentlyAlertedPoints.some(p => {
+    if (now - p.ts > 20 * 60 * 1000) return false;
+    const dx = (p.lng - lng) * 111320 * Math.cos(lat * Math.PI / 180);
+    const dy = (p.lat - lat) * 110540;
+    return Math.sqrt(dx * dx + dy * dy) < 300;
+  });
+}
+
+// ══════════════════════════════════════════════
+// طبقة الازدحام الدائمة على الخريطة (ماركرات ملونة تبقى ظاهرة وتتحدث تلقائياً، ما تختفي إلا إذا زال الازدحام فعلياً)
+// ══════════════════════════════════════════════
+const congestionMarkers = new Map(); // key -> { marker, level, ts }
+const CONGESTION_GRID_DEG = 0.003; // ~330 م، تجميع نفس نقطة الازدحام عبر التحديثات المتتالية بدل تكرارها كنقاط منفصلة
+
+function congestionKey(lat, lng) {
+  return Math.round(lat / CONGESTION_GRID_DEG) + '_' + Math.round(lng / CONGESTION_GRID_DEG);
+}
+
+function makeCongestionMarkerEl(level) {
+  const d = document.createElement('div');
+  d.style.cssText = `width:30px;height:30px;border-radius:50%;background:${level.color};display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(0,0,0,0.5),0 0 0 3px rgba(255,255,255,0.18);animation:blink 2s infinite;cursor:pointer;`;
+  d.innerHTML = `<i data-lucide="car" style="width:14px;height:14px;color:#fff;"></i>`;
+  lucide.createIcons({ nameAttr: 'data-lucide', root: d });
+  return d;
+}
+
+function upsertCongestionMarker(lat, lng, level) {
+  const key = congestionKey(lat, lng);
+  const existing = congestionMarkers.get(key);
+  if (existing) {
+    existing.ts = Date.now();
+    if (existing.level.key !== level.key) {
+      existing.level = level;
+      existing.marker.getElement().style.background = level.color;
+    }
+  } else {
+    const el = makeCongestionMarkerEl(level);
+    const marker = new maplibregl.Marker({ element: el, anchor: 'center' }).setLngLat([lng, lat]).addTo(map);
+    el.onclick = (ev) => {
+      ev.stopPropagation();
+      new maplibregl.Popup({ offset: 20, closeButton: true, className: 'reportPopup' })
+        .setLngLat([lng, lat])
+        .setHTML(`
+          <div style="font-family:'Cairo',sans-serif;text-align:center;padding:2px 4px;">
+            <div style="font-weight:700;color:${level.color};font-size:13px;">${level.label}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;">بيانات ازدحام حية</div>
+          </div>`)
+        .addTo(map);
+    };
+    congestionMarkers.set(key, { marker, level, ts: Date.now() });
+  }
+  return key;
+}
+
+function pruneCongestionMarkers(validKeys) {
+  congestionMarkers.forEach((entry, key) => {
+    if (!validKeys.has(key)) {
+      entry.marker.remove();
+      congestionMarkers.delete(key);
+    }
+  });
+}
+
+function clearCongestionLayer() {
+  congestionMarkers.forEach(entry => entry.marker.remove());
+  congestionMarkers.clear();
+}
+
+// يرسم/يحدّث كل نقاط الازدحام الحالية دفعة وحدة، ويحذف اللي ما عادت موجودة (يعني الازدحام زال فعلاً بتلك النقطة)
+function renderCongestionLayer(points) {
+  const validKeys = new Set();
+  points.forEach(p => validKeys.add(upsertCongestionMarker(p.lat, p.lng, p.level)));
+  pruneCongestionMarkers(validKeys);
+}
+
+// فحص الازدحام الحقيقي حول المستخدم من بلاغات Firebase (اليدوية + التلقائية من اكتشاف السرعة)
+// يعرض كل النقاط بشكل دائم على الخريطة + يرسل إشعار/تنبيه صوتي فقط عن أقوى نقطة جديدة (تفادي إزعاج الإشعارات المتكررة)
+async function checkRealCongestion() {
+  if (!congestionEnabled || !userPos) { clearCongestionLayer(); return; }
+  const [ulng, ulat] = userPos;
+
+  let points = [];
+  const nearby = await fetchFirebaseCongestionNear(ulat, ulng, CONGESTION_SEARCH_RADIUS_M);
+  if (nearby.length) {
+    points = clusterFirebaseReports(nearby).map(c => ({ lat: c.lat, lng: c.lng, level: reportCountToLevel(c.count) }));
+  }
+
+  renderCongestionLayer(points); // تظهر كل نقاط الازدحام بشكل دائم على الخريطة، بدون علاقة بالإشعارات
+
+  if (!points.length) return;
+  const top = points[0];
+  if (alreadyAlertedNear(top.lat, top.lng)) return;
+  recentlyAlertedPoints.push({ lat: top.lat, lng: top.lng, ts: Date.now() });
+  const area = await reverseGeocodeStreetArea(top.lng, top.lat);
+  pushCongestionAlert(area, top.level);
   renderNotifList();
 }
-setInterval(simulateCongestionCheck, 60000);
+setInterval(checkRealCongestion, 60000);
+checkRealCongestion(); // فحص فوري عند بدء التطبيق بدل الانتظار دقيقة كاملة
 
 function timeAgo(ts) {
   const mins = Math.max(1, Math.round((Date.now() - ts) / 60000));
@@ -4238,6 +4673,10 @@ document.getElementById('notifOverlay').onclick = closeNotifications;
     maybeShowVehicleOnboard();
   }
 
+  // نقرة بأي مكان بشاشة السبلاش تختصرها فوراً بدل انتظار المدة كاملة
+  splash.addEventListener('click', hideSplash);
+  splash.style.cursor = 'pointer';
+
   // نضمن بدء التشغيل فقط بعد تجهّز قدر كافٍ من الفيديو بالذاكرة، لتفادي
   // التقطيع/التهنيج بالثواني الأولى — لو ماكو دعم لهذا الحدث، يشتغل عادي بالـ autoplay
   const video = document.getElementById('splashVideo');
@@ -4266,13 +4705,13 @@ function finishVehicleOnboard(choice, bikeFilter) {
   localStorage.setItem('sqoor_vehicle_choice', choice);
   localStorage.setItem('sqoor_vehicle_onboarding_done', '1');
   const carIdx  = ARROW_STYLES.findIndex(s => s.name === 'سيارة');
+  const taxiIdx = ARROW_STYLES.findIndex(s => s.name === 'تكسي');
   const bikeIdx = ARROW_STYLES.findIndex(s => s.name === 'دراجة');
 
   if (choice === 'private' || choice === 'taxi') {
-    const filter = choice === 'taxi' ? TAXI_YELLOW_FILTER : 'none';
-    ARROW_STYLES[carIdx].svg = `<img src="${CAR_IMG_NAV}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;filter:${filter};" draggable="false" />`;
-    applyArrowStyle(ARROW_STYLES[carIdx].svg);
-    localStorage.setItem('sqoor_car_style', String(carIdx));
+    const idx = choice === 'taxi' ? taxiIdx : carIdx;
+    applyArrowStyle(ARROW_STYLES[idx].svg);
+    localStorage.setItem('sqoor_car_style', String(idx));
   } else if (choice === 'bike') {
     localStorage.setItem('sqoor_bike_filter', bikeFilter);
     ARROW_STYLES[bikeIdx].svg = `<img src="${BIKE_IMG_NAV}" width="92" height="92" style="display:block;width:92px;height:92px;object-fit:contain;pointer-events:none;filter:${bikeFilter};" draggable="false" />`;
@@ -4322,6 +4761,53 @@ function finishVehicleOnboard(choice, bikeFilter) {
 // INIT
 // ══════════════════════════════════════════════
 lucide.createIcons();
+</script>
+<script src="https://unpkg.com/@capacitor/core@6/dist/capacitor.js"></script>
+<script>
+(function() {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform || !window.Capacitor.isNativePlatform()) return;
+
+  function parseGeoUrl(url) {
+    try {
+      let m = url.match(/geo:([\-0-9.]+),([\-0-9.]+)/);
+      if (m && !(m[1] === '0' && m[2] === '0')) {
+        return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) };
+      }
+      let q = url.match(/[?&]q=([\-0-9.]+),([\-0-9.]+)/);
+      if (q) return { lat: parseFloat(q[1]), lng: parseFloat(q[2]) };
+    } catch(e) {}
+    return null;
+  }
+
+  function goToDestination(coords) {
+    const tryStart = () => {
+      if (typeof userPos !== 'undefined' && userPos && typeof setDestinationAt === 'function') {
+        setDestinationAt({ lng: coords.lng, lat: coords.lat });
+      } else {
+        setTimeout(tryStart, 500);
+      }
+    };
+    tryStart();
+  }
+
+  function handleUrl(url) {
+    const coords = parseGeoUrl(url);
+    if (coords) goToDestination(coords);
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const { App } = Capacitor.Plugins;
+    if (!App) return;
+
+    App.addListener('appUrlOpen', (data) => {
+      if (data && data.url) handleUrl(data.url);
+    });
+
+    App.getLaunchUrl().then((result) => {
+      if (result && result.url) handleUrl(result.url);
+    }).catch(() => {});
+  });
+})();
 </script>
 </body>
 </html>
