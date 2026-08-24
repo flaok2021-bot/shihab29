@@ -4,6 +4,7 @@ let xml = fs.readFileSync(path, 'utf8');
 
 xml = xml.replace('</manifest>', `    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 </manifest>`);
 
 const navIntents = `
