@@ -669,6 +669,35 @@ body.day-mode .sBtn svg { stroke:#16a34a; }
 }
 #splashVideo.ready { visibility:visible; }
 
+/* ─── شاشة عدم توفر الإنترنت ─── */
+#offlineOverlay {
+  position:fixed; inset:0; z-index:9999999;
+  background:radial-gradient(circle at 50% 30%, rgba(239,68,68,0.10), transparent 60%), #0b1220;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:28px; text-align:center;
+  opacity:0; visibility:hidden;
+  transition:opacity .4s ease, visibility .4s ease;
+}
+#offlineOverlay.show { opacity:1; visibility:visible; }
+#offlineOverlay h2 {
+  color:#f1f5f9; font-size:21px; font-weight:900; margin:0 0 22px; letter-spacing:.2px;
+  font-family:'Tajawal','Cairo',sans-serif;
+}
+#offlineOverlay .off-retry {
+  display:flex; align-items:center; gap:9px;
+  padding:13px 28px; border-radius:14px; cursor:pointer;
+  background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.35);
+  color:#86efac; font-size:14px; font-weight:700;
+  font-family:'Tajawal','Cairo',sans-serif;
+  transition:background .15s, transform .1s;
+}
+#offlineOverlay .off-retry:active { background:rgba(34,197,94,0.22); transform:scale(0.97); }
+#offlineOverlay .off-retry svg { width:17px; height:17px; stroke:#86efac; }
+#offlineOverlay .off-retry.spin svg { animation:offRetrySpin .8s linear; }
+@keyframes offRetrySpin { from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+body.day-mode #offlineOverlay { background:radial-gradient(circle at 50% 30%, rgba(239,68,68,0.06), transparent 60%), #f4f7fb; }
+body.day-mode #offlineOverlay h2 { color:#1e293b; }
+
 /* ─── شاشة اختيار وسيلة الاستخدام (أول فتح فقط) ─── */
 #vehicleOnboard {
   position:fixed; inset:0; z-index:999998;
@@ -785,7 +814,7 @@ select.vo-input {
 #shareSheetOverlay.show .ss-card { transform:translateY(0); }
 .ss-handle { width:38px; height:4px; border-radius:3px; background:rgba(255,255,255,0.18); margin:8px auto 16px; }
 .ss-title { color:#f1f5f9; font-size:15px; font-weight:800; font-family:'Tajawal','Cairo',sans-serif; text-align:center; margin-bottom:18px; }
-.ss-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px 6px; margin-bottom:6px; }
+.ss-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px 6px; margin-bottom:6px; }
 .ss-opt { display:flex; flex-direction:column; align-items:center; gap:8px; cursor:pointer; background:none; border:none; padding:6px 2px; }
 .ss-opt:active { transform:scale(.93); }
 .ss-opt-ic {
@@ -809,7 +838,13 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
 <body>
 
 <div id="splashScreen">
-  <video id="splashVideo" src="https://g.top4top.io/m_3873fc9y30.mp4" poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICTAEAOw==" autoplay muted playsinline webkit-playsinline disablepictureinpicture preload="auto"></video>
+  <video id="splashVideo" src="splash.mp4" poster="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICTAEAOw==" playsinline webkit-playsinline disablepictureinpicture preload="auto"></video>
+</div>
+
+<!-- شاشة عدم توفر الإنترنت — تظهر تلقائياً عند انقطاع الشبكة وتختفي فور عودتها -->
+<div id="offlineOverlay">
+  <h2>لا يوجد اتصال بالإنترنت</h2>
+  <button id="offlineRetryBtn" class="off-retry"><i data-lucide="refresh-cw"></i> إعادة المحاولة</button>
 </div>
 
 <!-- شاشة اختيار وسيلة الاستخدام — تظهر عند أول فتح للتطبيق (بيانات الاسم/المحافظة + الوسيلة) -->
@@ -866,15 +901,15 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
     <p class="sub">اختر وسيلتك حتى نظبطلك التطبيق عليها</p>
     <div class="vo-grid">
       <div class="vo-card" data-choice="private">
-        <div class="vo-icon-ring"><div class="vo-icon"><img src="https://i.ibb.co/8nfhzb7f/1000308157-removebg-preview.png" alt="خصوصي" /></div></div>
+        <div class="vo-icon-ring"><div class="vo-icon"><img src="assets/car-private.png" alt="خصوصي" /></div></div>
         <span>خصوصي</span>
       </div>
       <div class="vo-card" data-choice="taxi">
-        <div class="vo-icon-ring"><div class="vo-icon"><img src="https://i.ibb.co/wNPDNh9v/1000311402-removebg-preview.png" alt="تكسي" /></div></div>
+        <div class="vo-icon-ring"><div class="vo-icon"><img src="assets/car-taxi.png" alt="تكسي" /></div></div>
         <span>تكسي</span>
       </div>
       <div class="vo-card" data-choice="bike">
-        <div class="vo-icon-ring"><div class="vo-icon"><img src="https://e.top4top.io/p_38737xdm50.png" alt="دراجة" /></div></div>
+        <div class="vo-icon-ring"><div class="vo-icon"><img src="assets/bike.png" alt="دراجة" /></div></div>
         <span>دراجة</span>
       </div>
     </div>
@@ -899,6 +934,14 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
       <button class="ss-opt" data-ss="whatsapp">
         <div class="ss-opt-ic"><svg viewBox="0 0 24 24" fill="#25D366"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2z"/></svg></div>
         <span>واتساب</span>
+      </button>
+      <button class="ss-opt" data-ss="messenger">
+        <div class="ss-opt-ic"><svg viewBox="0 0 24 24" fill="#00B2FF"><path d="M12 2C6.48 2 2 6.13 2 11.7c0 3.02 1.35 5.72 3.5 7.55V22l3.2-1.76c.87.24 1.8.37 2.77.37 5.02 0 9-3.87 9.5-8.9C21.5 6.13 17.02 2 12 2z"/></svg></div>
+        <span>ماسنجر</span>
+      </button>
+      <button class="ss-opt" data-ss="viber">
+        <div class="ss-opt-ic"><svg viewBox="0 0 24 24" fill="#7360F2"><path d="M12 2C6.5 2 2 5.6 2 10c0 2.9 1.9 5.4 4.7 6.9-.15.9-.55 2.5-.63 2.9-.1.5.18.5.38.36.15-.1 2.4-1.6 3.4-2.3.7.1 1.4.15 2.15.15 5.5 0 10-3.6 10-8 0-4.4-4.5-8-10-8z"/></svg></div>
+        <span>فايبر</span>
       </button>
       <button class="ss-opt" data-ss="telegram">
         <div class="ss-opt-ic"><svg viewBox="0 0 24 24" fill="#29A9EA"><path d="M9.04 15.62 8.88 20c.4 0 .58-.17.79-.38l1.9-1.83 3.94 2.89c.72.4 1.24.19 1.43-.67l2.6-12.25c.25-1.06-.38-1.48-1.08-1.21L3.5 10.9c-1.03.4-1.02.98-.18 1.24l4.5 1.4L18 7.5c.47-.3.9-.13.55.17"/></svg></div>
@@ -1058,7 +1101,10 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
 
 <!-- لوحة اختيار نوع البلاغ -->
 <div id="reportPanel" style="position:fixed;bottom:60px;left:50%;transform:translateX(-50%);z-index:1000;display:none;flex-direction:column;gap:10px;background:rgba(10,14,26,0.95);border:1px solid rgba(34,197,94,0.3);border-radius:18px;padding:16px;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.5);min-width:230px;max-height:72vh;overflow-y:auto;">
-  <div style="font-size:13px;color:#86efac;font-weight:700;text-align:center;">إضافة بلاغ</div>
+  <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+    <div style="font-size:13px;color:#86efac;font-weight:700;text-align:center;">إضافة بلاغ</div>
+    <button id="reportPanelClose" style="position:absolute;left:0;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#94a3b8;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;line-height:1;">✕</button>
+  </div>
   <div id="reportOptions" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;"></div>
   <div style="font-size:11px;color:#475569;text-align:center;">سيُضاف البلاغ مباشرة على موقعك الحالي</div>
 </div>
@@ -1955,12 +2001,16 @@ function speakWeb(text) {
 // ══════════════════════════════════════════════
 // ARROW MARKER — سهم افتراضي ثابت قبل تحديد المسار، ويتحول لسهم بشكل مختلف (بدل صورة السيارة) بعد تحديد المسار
 // ══════════════════════════════════════════════
+// ⚠️ الصور محلية الآن (مو روابط خارجية) — لأن مواقع رفع الصور المجانية (ibb.co / top4top)
+// تحجب تحميل صورها تلقائياً داخل تطبيق الـAPK المُغلّف (WebView) حتى لو تشتغل زين بالمتصفح العادي.
+// الحل النهائي: الصور مرفوعة كملفات فعلية داخل مجلد www/assets بالمستودع، وتُحمّل من هناك مباشرة
+// بدون أي اتصال إنترنت أو اعتماد على موقع خارجي — هذا يضمن ظهورها دايماً داخل الـAPK.
 let carColorFilter = 'none';
-const CAR_IMG_PRIVATE = 'https://i.ibb.co/8nfhzb7f/1000308157-removebg-preview.png';
-const CAR_BRAKE_IMG_PRIVATE = 'https://i.ibb.co/3KWKYQM/1000310082-removebg-preview.png'; // نفس سيارة الخصوصي مع إضاءة أضواء الفرامل
-const CAR_IMG_TAXI = 'https://i.ibb.co/wNPDNh9v/1000311402-removebg-preview.png';
-const CAR_BRAKE_IMG_TAXI = 'https://i.ibb.co/0kBzfFh/1000311401-removebg-preview.png'; // نفس سيارة التكسي مع إضاءة أضواء الفرامل
-const BIKE_IMG_NAV = 'https://e.top4top.io/p_38737xdm50.png';
+const CAR_IMG_PRIVATE = 'assets/car-private.png';
+const CAR_BRAKE_IMG_PRIVATE = 'assets/car-private-brake.png'; // نفس سيارة الخصوصي مع إضاءة أضواء الفرامل
+const CAR_IMG_TAXI = 'assets/car-taxi.png';
+const CAR_BRAKE_IMG_TAXI = 'assets/car-taxi-brake.png'; // نفس سيارة التكسي مع إضاءة أضواء الفرامل
+const BIKE_IMG_NAV = 'assets/bike.png';
 
 // تدرجات ألوان الدراجة (تلوّن الدراجة وملابس السائق معاً بنفس درجة اللون) — تُختار من شاشة الترحيب أو لاحقاً من الإعدادات
 const BIKE_COLOR_PRESETS = [
@@ -1980,7 +2030,7 @@ const savedBikeFilter = localStorage.getItem('sqoor_bike_filter') || BIKE_COLOR_
 // السهم الافتراضي الثابت — يظهر فقط قبل تحديد أي مسار، وغير قابل للتغيير من الإعدادات
 // السهم الرئيسي — أيقونة صورة مخصصة (بدل الشكل المثلث الافتراضي)
 // السهم الرئيسي — أيقونة صورة مخصصة (بدل الشكل المثلث الافتراضي)
-const MAIN_ARROW_IMG_URL = 'https://i.ibb.co/ccjcM9LR/1000316108-removebg-preview.png';
+const MAIN_ARROW_IMG_URL = 'assets/arrow-main.png';
 // لو الصورة نفسها مرسومة غير متجهة للأعلى تماماً (0°)، غيّري هذا الرقم (بالدرجات) حتى يتماشى دورانها
 // مع اتجاه حركتك الفعلي — مثلاً 90 لو الصورة متجهة يمين، -90 لو متجهة يسار، 180 لو مقلوبة
 const ARROW_IMG_ANGLE_OFFSET = 0;
@@ -2768,6 +2818,18 @@ map.on('load', () => {
   const emptyFC   = { type:'FeatureCollection', features:[] };
 
   try {
+  // تسمية مخصصة "خليج المسلمين" — غير موجودة أصلاً بخريطة OpenFreeMap الأساسية، نضيفها يدوياً
+  // في منتصف الماء (بعيداً عن الفاو)، وتتلون تلقائياً حسب الوضع الليلي/النهاري (applyDayNightVisuals)
+  map.addSource('custom-gulf-label', { type:'geojson', data: {
+    type:'Feature', geometry:{ type:'Point', coordinates:[51.3, 27.2] }, properties:{}
+  }});
+  map.addLayer({ id:'custom-gulf-label', type:'symbol', source:'custom-gulf-label', minzoom:3, maxzoom:11,
+    layout:{ 'text-field':'خليــــــج المسلميــــــــن', 'text-font':['Noto Sans Bold'], 'text-size':15,
+             'text-letter-spacing':0.05, 'text-max-width':10 },
+    paint:{ 'text-color': isNight ? '#7fb8e0' : '#0c4a6e',
+            'text-halo-color': isNight ? '#04263b' : '#ffffff', 'text-halo-width':1.4 }
+  });
+
   map.addSource('route',  { type:'geojson', data: emptyLine, lineMetrics: true });
 
   // glow
@@ -3052,7 +3114,7 @@ function gotGPS(lng, lat, fallback=false) {
       // حيدت عن المسار — بعد عدة قراءات متتالية بعيدة (مو مجرد تذبذب GPS لحظي)
       // نطلب مسار جديد تلقائياً من موقعك الحالي إلى نفس الوجهة
       offRouteCount++;
-      if (offRouteCount >= 4 && destPos && !isRerouting) {
+      if (offRouteCount >= 2 && destPos && !isRerouting) {
         offRouteCount = 0;
         autoReroute();
       }
@@ -3233,8 +3295,8 @@ async function autoReroute() {
       altRoutes = data.routes;
       altIndex  = 0;
       document.getElementById('btnAltRoute').style.display = altRoutes.length > 1 ? 'flex' : 'none';
-      applyRoute(altRoutes[0]);
-      // بطاقة تأكيد واضحة: تم استبدال المسار القديم بمسار جديد يطابق طريقك الحالي
+      applyRoute(altRoutes[0], true); // silent: بدون بطاقة "ابدأ الملاحة"، الملاحة تكمل مباشرة
+      // بطاقة تأكيد صغيرة وسريعة (تختفي تلقائياً) توضّح أن المسار تحدّث، بدون إيقاف الملاحة
       showRerouteConfirmCard(altRoutes[0]);
     } else {
       showGPSToast('تعذّر تحديد مسار جديد، حاول مرة أخرى');
@@ -3288,10 +3350,10 @@ function showRerouteConfirmCard(route) {
     c.style.opacity = '0';
     c.style.transform = 'translateX(-50%) translateY(-140%)';
     setTimeout(() => { c.style.display = 'none'; }, 320);
-  }, 3200);
+  }, 2200);
 }
 
-function applyRoute(route) {
+function applyRoute(route, silent) {
   const coords = route.geometry.coordinates;
   const distKm = route.distance/1000;
   const dist   = distKm.toFixed(1);
@@ -3343,7 +3405,14 @@ function applyRoute(route) {
 
   document.getElementById('ovDist').textContent = dist;
   document.getElementById('ovTime').textContent = mins;
-  showOverview(coords, b);
+
+  if (silent) {
+    // إعادة توجيه أثناء الملاحة النشطة: لا نعرض بطاقة "ابدأ الملاحة" ولا نغيّر الكاميرا —
+    // المسار الجديد يُطبّق مباشرة وتستمر الملاحة بنفس وضعها الحالي بدون أي انقطاع
+    setRouteThick();
+  } else {
+    showOverview(coords, b);
+  }
 }
 
 document.getElementById('btnAltRoute').onclick = () => {
@@ -4523,14 +4592,18 @@ let barExpanded = false;
   const PEEK_NORMAL = 96; // بمقدار كم بكسل يبين شريط البحث وهو مطوي في الوضع العادي
   const OPEN_DISTANCE_PX = 18; // سحبة صغيرة كافية لفتح البطاقة بالكامل
   const OPEN_VELOCITY    = 0.35; // سحبة سريعة لفوق (px/ms) تفتح البطاقة فوراً حتى لو كانت قصيرة
-  const DRAG_IGNORE_SEL  = 'button, .qs-search, input, #qsSearchResults'; // هذي العناصر تشتغل بنقرتها/تمريرها العادي وما تبدأ سحب
+  const DRAG_IGNORE_SEL  = '.qs-search, input, #qsSearchResults'; // هذي وحدها تحتاج تمرير/كتابة طبيعية وما تبدأ سحب أبداً
+  const TAP_TOLERANCE_PX = 6; // إزاحة أقل من هذا تُحتسب "ضغطة" عادية (يشتغل الزر تحتها)، أكبر منها تصير سحب فعلي
   let sheetH = 400;
   let peekH  = PEEK_NORMAL; // أثناء وجود مسار محدد تصير بمقدار ارتفاع خط السحب فقط (انظر measure)
-  let dragging = false;
+  let dragging = false;      // سحب فعلي تجاوز حد الإزاحة (متحرك فعلاً)
+  let dragCandidate = false; // ضغطة بدأت وممكن تتحول لسحب لو تحركت
+  let suppressClick = false; // لو صارت سحب فعلي فوق زر، نلغي نقرة الزر بعد رفع الإصبع
   let startY = 0;
   let startTranslate = 0;
   let lastY = 0, lastT = 0, velocity = 0;
   let pendingY = null, rafId = null;
+  let downTarget = null;
 
   function measure() {
     const prevTransition = sheet.style.transition;
@@ -4581,37 +4654,46 @@ let barExpanded = false;
   };
 
   sheet.addEventListener('pointerdown', (e) => {
-    if (e.target.closest(DRAG_IGNORE_SEL)) return; // اترك الأزرار تشتغل عادي
+    if (e.target.closest(DRAG_IGNORE_SEL)) return; // البحث/الكتابة فقط تبقى مستثناة
     measure();
-    dragging = true;
+    dragCandidate = true;
+    dragging = false;
+    suppressClick = false;
+    downTarget = e.target;
     startY = lastY = e.clientY;
     lastT = performance.now();
     velocity = 0;
     startTranslate = barExpanded ? 0 : sheetH - peekH;
     sheet.style.transition = 'none';
-    sheet.setPointerCapture(e.pointerId);
+    try { sheet.setPointerCapture(e.pointerId); } catch(_) {}
   });
 
   sheet.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
+    if (!dragCandidate) return;
+    const dy = e.clientY - startY;
+    if (!dragging) {
+      if (Math.abs(dy) < TAP_TOLERANCE_PX) return; // لسه بحدود الضغطة، ما نبدأ نحرك البطاقة
+      dragging = true;
+      suppressClick = true; // تجاوزت حد الضغطة فوق عنصر (زر مثلاً) → صارت سحب، نلغي نقرته بعدين
+    }
     const now = performance.now();
     const dt  = now - lastT;
     if (dt > 0) velocity = (e.clientY - lastY) / dt; // موجب = تتحرك لأسفل، سالب = لفوق
     lastY = e.clientY; lastT = now;
-    const dy = e.clientY - startY; // موجب = سحب لأسفل
     setY(startTranslate + dy);
   });
 
   function endDrag(e) {
-    if (!dragging) return;
+    if (!dragCandidate) return;
+    dragCandidate = false;
+    if (!dragging) {
+      // ضغطة عادية بدون سحب فعلي: لو كانت فوق زر نخليه يشتغل طبيعي، وإلا (مساحة فاضية بالبطاقة) نبدّل حالة الطي
+      if (!downTarget || !downTarget.closest('button')) snap(!barExpanded);
+      return;
+    }
     dragging = false;
     if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
     const dy = (e.clientY ?? startY) - startY;
-    if (Math.abs(dy) < 6) {
-      // ضغطة بسيطة بدون سحب فعلي → تبديل الحالة مباشرة
-      snap(!barExpanded);
-      return;
-    }
     // بمجرد ما ترفع البطاقة لفوق (سحبة صغيرة أو سحبة سريعة) تنفتح بالكامل مباشرة
     if (!barExpanded && (dy < -OPEN_DISTANCE_PX || velocity < -OPEN_VELOCITY)) { snap(true); return; }
     if (barExpanded && (dy > OPEN_DISTANCE_PX || velocity > OPEN_VELOCITY)) { snap(false); return; }
@@ -4620,6 +4702,11 @@ let barExpanded = false;
   }
   sheet.addEventListener('pointerup', endDrag);
   sheet.addEventListener('pointercancel', endDrag);
+
+  // لو صار سحب فعلي فوق زر، نلغي نقرته بعد رفع الإصبع حتى ما يضغط بالغلط أثناء السحب
+  sheet.addEventListener('click', (e) => {
+    if (suppressClick) { e.preventDefault(); e.stopPropagation(); suppressClick = false; }
+  }, true);
 
   window.addEventListener('resize', () => { measure(); snap(barExpanded); });
   measure();
@@ -4695,6 +4782,10 @@ function applyDayNightVisuals() {
   document.body.classList.toggle('day-mode', !isNight);
   applyMainArrowColor();
   lucide.createIcons();
+  if (map.getLayer('custom-gulf-label')) {
+    map.setPaintProperty('custom-gulf-label', 'text-color', isNight ? '#7fb8e0' : '#0c4a6e');
+    map.setPaintProperty('custom-gulf-label', 'text-halo-color', isNight ? '#04263b' : '#ffffff');
+  }
   // إذا كان القمر الصناعي مفعّلاً، الرجوع لوضع الخريطة العادية عند تبدّل الوضع
   if (mapMode === 'satellite') {
     mapMode = isNight ? 'night' : 'day';
@@ -4900,6 +4991,13 @@ document.getElementById('btnReport').onclick = function() {
 };
 // مثلث الإبلاغات العائم بيمين الشاشة يفتح نفس قائمة البلاغات بالضبط
 document.getElementById('reportFab').onclick = () => document.getElementById('btnReport').onclick();
+
+// زر الإغلاق X بأعلى بطاقة الإبلاغات
+document.getElementById('reportPanelClose').onclick = () => {
+  document.getElementById('reportPanel').style.display = 'none';
+  document.getElementById('btnReport').classList.remove('on');
+  document.getElementById('reportFab').classList.remove('on');
+};
 
 // ══════════════════════════════════════════════
 // اختيار موقع البلاغ بالضغط على أي نقطة بالخريطة
@@ -5577,6 +5675,12 @@ document.querySelectorAll('.ss-opt').forEach(btn => {
     const dest = btn.getAttribute('data-ss');
     if (dest === 'whatsapp') {
       window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    } else if (dest === 'messenger') {
+      const urlMatch = text.match(/https?:\/\/\S+/);
+      const link = urlMatch ? urlMatch[0] : text;
+      window.open(`fb-messenger://share/?link=${encodeURIComponent(link)}`, '_blank');
+    } else if (dest === 'viber') {
+      window.open(`viber://forward?text=${encodeURIComponent(text)}`, '_blank');
     } else if (dest === 'telegram') {
       window.open(`https://t.me/share/url?url=${encodeURIComponent(text)}`, '_blank');
     } else if (dest === 'sms') {
@@ -6277,17 +6381,80 @@ document.getElementById('notifOverlay').onclick = closeNotifications;
   const video = document.getElementById('splashVideo');
   if (video) {
     video.playbackRate = 1;
-    const tryPlay = () => { video.play().catch(() => {}); video.classList.add('ready'); };
+    let unmuteOnInteractionAdded = false;
+    function addUnmuteOnInteraction() {
+      if (unmuteOnInteractionAdded) return;
+      unmuteOnInteractionAdded = true;
+      const unmute = () => { video.muted = false; video.play().catch(() => {}); };
+      splash.addEventListener('touchstart', unmute, { once:true, passive:true });
+      splash.addEventListener('click', unmute, { once:true });
+    }
+    const tryPlay = () => {
+      video.classList.add('ready');
+      // نحاول التشغيل بالصوت مباشرة أولاً؛ لو المتصفح/الـWebView رفض التشغيل التلقائي
+      // بالصوت (سياسة autoplay شائعة)، نرجع نكتم الصوت لضمان تشغيل الفيديو، ونفعّل
+      // الصوت تلقائياً بأول لمسة/نقرة من المستخدم على الشاشة
+      video.muted = false;
+      video.play().catch(() => {
+        video.muted = true;
+        video.play().catch(() => {});
+        addUnmuteOnInteraction();
+      });
+    };
     if (video.readyState >= 3) tryPlay();
     else video.addEventListener('canplay', tryPlay, { once:true });
-    // لو فشل تحميل الفيديو (رابط معطّل/محظور) نطلع مباشرة من السبلاش بدل عرض أيقونة معطّلة
-    video.addEventListener('error', hideSplash, { once:true });
+    // لو فشل تحميل الفيديو (رابط معطّل/محظور) ما نطلع فوراً من السبلاش — نخفي الفيديو
+    // بس ونخلي الخلفية البيضاء ظاهرة لحد ما تخلص المدة الدنيا/تجهز الخريطة (نفس منطق الإخفاء العادي)
+    video.addEventListener('error', () => { video.style.display = 'none'; }, { once:true });
   }
 
   const minTime  = new Promise(res => setTimeout(res, 10000));
   const mapReady = new Promise(res => map.once('load', res));
   Promise.all([minTime, mapReady]).then(hideSplash);
   setTimeout(hideSplash, 13000); // إخفاء احتياطي إذا تأخر تحميل الخريطة
+})();
+
+// ══════════════════════════════════════════════
+// شاشة عدم توفر الإنترنت — تظهر تلقائياً عند انقطاع الشبكة وتختفي فور عودتها
+// ══════════════════════════════════════════════
+(function(){
+  const overlay  = document.getElementById('offlineOverlay');
+  const retryBtn = document.getElementById('offlineRetryBtn');
+  if (!overlay) return;
+  lucide.createIcons();
+
+  function showOffline() { overlay.classList.add('show'); }
+  function hideOffline()  { overlay.classList.remove('show'); }
+  function syncStatus()  { navigator.onLine ? hideOffline() : showOffline(); }
+
+  window.addEventListener('offline', showOffline);
+  window.addEventListener('online', hideOffline);
+  // فحص أولي بعد اختفاء السبلاش حتى ما تتزاحم الشاشتين فوق بعض
+  const splashEl = document.getElementById('splashScreen');
+  if (splashEl) {
+    const obs = new MutationObserver(() => {
+      if (!document.body.contains(splashEl) || splashEl.classList.contains('hide')) {
+        obs.disconnect();
+        syncStatus();
+      }
+    });
+    obs.observe(document.body, { childList:true, attributes:true, subtree:false });
+  } else {
+    syncStatus();
+  }
+
+  if (retryBtn) {
+    retryBtn.onclick = () => {
+      retryBtn.classList.add('spin');
+      setTimeout(() => retryBtn.classList.remove('spin'), 800);
+      // navigator.onLine ينعكس فوراً من نظام التشغيل، ونتأكد إضافياً بمحاولة نبضة شبكة خفيفة
+      if (navigator.onLine) {
+        fetch('https://www.gstatic.com/generate_204', { mode:'no-cors', cache:'no-store' })
+          .then(() => hideOffline())
+          .catch(() => {}); // لسه ماكو نت فعلياً رغم onLine — نخليها ظاهرة
+      }
+    };
+  }
 })();
 
 // ══════════════════════════════════════════════
