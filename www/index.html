@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>خريطة صقور العراق</title>
 <link rel="preload" href="https://g.top4top.io/m_3873fc9y30.mp4" as="video" type="video/mp4">
-<script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js" crossorigin="anonymous"></script>
-<link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet"/>
+<script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js" crossorigin="anonymous"></script>
+<link href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" crossorigin="anonymous"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" crossorigin="anonymous"></script>
@@ -15,8 +15,121 @@
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; }
 button, a, input, .sBtn, .bBtn, .stg-row, .spRes { -webkit-tap-highlight-color:transparent; outline:none; }
 button:focus, a:focus { outline:none; }
-html,body { height:100%; font-family:'Cairo',sans-serif; overflow:hidden; touch-action:none; }
-#map { width:100vw; height:100vh; will-change:transform; }
+html,body {
+  height:100%; font-family:'Cairo',sans-serif; overflow:hidden; touch-action:none;
+  background-color:#03050c;
+  /* ─ حقل نجوم كثيف يظهر خلف الكرة الأرضية عند الابتعاد (خارج حدود الكرة، شفاف بالخريطة) ─ */
+  background-image:
+    radial-gradient(2.5px 2.5px at 39.7% 5.7%, #ffffff, transparent 100%),
+    radial-gradient(3.0px 3.0px at 36.8% 6.7%, #ffffff, transparent 100%),
+    radial-gradient(2.7px 2.7px at 9.4% 42.0%, #ffffff, transparent 100%),
+    radial-gradient(2.4px 2.4px at 6.8% 56.4%, #f3f8ff, transparent 100%),
+    radial-gradient(3.1px 3.1px at 57.6% 39.9%, #ffffff, transparent 100%),
+    radial-gradient(3.2px 3.2px at 55.6% 14.1%, #ffffff, transparent 100%),
+    radial-gradient(2.6px 2.6px at 56.9% 55.9%, #ffffff, transparent 100%),
+    radial-gradient(2.9px 2.9px at 58.0% 63.6%, #ffffff, transparent 100%),
+    radial-gradient(2.6px 2.6px at 56.3% 61.7%, #ffffff, transparent 100%),
+    radial-gradient(2.7px 2.7px at 77.2% 46.6%, #f3f8ff, transparent 100%),
+    radial-gradient(3.1px 3.1px at 30.4% 78.8%, #f3f8ff, transparent 100%),
+    radial-gradient(2.9px 2.9px at 9.0% 30.4%, #ffffff, transparent 100%),
+    radial-gradient(2.7px 2.7px at 72.5% 29.2%, #f3f8ff, transparent 100%),
+    radial-gradient(3.2px 3.2px at 51.2% 17.2%, #ffffff, transparent 100%),
+    radial-gradient(2.5px 2.5px at 42.3% 95.3%, #f3f8ff, transparent 100%),
+    radial-gradient(2.3px 2.3px at 34.3% 35.3%, #f3f8ff, transparent 100%),
+    radial-gradient(2.7px 2.7px at 7.7% 10.2%, #f3f8ff, transparent 100%),
+    radial-gradient(2.5px 2.5px at 6.9% 69.7%, #ffffff, transparent 100%),
+    radial-gradient(2.8px 2.8px at 28.9% 38.8%, #f3f8ff, transparent 100%),
+    radial-gradient(2.9px 2.9px at 93.2% 35.8%, #ffffff, transparent 100%),
+    radial-gradient(2.8px 2.8px at 6.8% 76.3%, #f3f8ff, transparent 100%),
+    radial-gradient(2.3px 2.3px at 40.0% 90.8%, #ffffff, transparent 100%),
+    radial-gradient(1.7px 1.7px at 45.0% 54.8%, #ffffff, transparent 100%),
+    radial-gradient(1.9px 1.9px at 85.7% 28.3%, #dbeafe, transparent 100%),
+    radial-gradient(1.6px 1.6px at 67.9% 38.3%, #dbeafe, transparent 100%),
+    radial-gradient(1.5px 1.5px at 18.3% 23.7%, #ffffff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 82.4% 18.9%, #dbeafe, transparent 100%),
+    radial-gradient(1.6px 1.6px at 42.1% 37.2%, #ffffff, transparent 100%),
+    radial-gradient(1.7px 1.7px at 68.7% 51.5%, #ffffff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 73.5% 45.8%, #eaf2ff, transparent 100%),
+    radial-gradient(1.9px 1.9px at 79.2% 39.5%, #eaf2ff, transparent 100%),
+    radial-gradient(1.6px 1.6px at 48.2% 40.2%, #ffffff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 44.2% 11.8%, #ffffff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 1.0% 15.8%, #ffffff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 61.1% 7.9%, #dbeafe, transparent 100%),
+    radial-gradient(1.5px 1.5px at 15.6% 25.7%, #dbeafe, transparent 100%),
+    radial-gradient(1.6px 1.6px at 47.5% 12.3%, #dbeafe, transparent 100%),
+    radial-gradient(1.7px 1.7px at 48.1% 31.6%, #dbeafe, transparent 100%),
+    radial-gradient(1.5px 1.5px at 34.6% 26.9%, #eaf2ff, transparent 100%),
+    radial-gradient(1.9px 1.9px at 51.6% 21.1%, #ffffff, transparent 100%),
+    radial-gradient(2.0px 2.0px at 15.4% 54.2%, #dbeafe, transparent 100%),
+    radial-gradient(1.4px 1.4px at 30.2% 64.0%, #eaf2ff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 51.8% 90.0%, #dbeafe, transparent 100%),
+    radial-gradient(1.6px 1.6px at 53.2% 77.3%, #ffffff, transparent 100%),
+    radial-gradient(1.6px 1.6px at 61.1% 78.3%, #ffffff, transparent 100%),
+    radial-gradient(1.9px 1.9px at 80.0% 81.2%, #ffffff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 20.6% 49.3%, #ffffff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 78.4% 47.3%, #ffffff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 94.7% 44.8%, #eaf2ff, transparent 100%),
+    radial-gradient(2.0px 2.0px at 94.6% 36.7%, #dbeafe, transparent 100%),
+    radial-gradient(1.5px 1.5px at 47.1% 34.1%, #ffffff, transparent 100%),
+    radial-gradient(1.7px 1.7px at 83.4% 48.0%, #eaf2ff, transparent 100%),
+    radial-gradient(1.8px 1.8px at 9.3% 65.7%, #eaf2ff, transparent 100%),
+    radial-gradient(1.9px 1.9px at 74.5% 47.8%, #eaf2ff, transparent 100%),
+    radial-gradient(1.5px 1.5px at 33.6% 79.5%, #eaf2ff, transparent 100%),
+    radial-gradient(2.0px 2.0px at 46.4% 73.8%, #dbeafe, transparent 100%),
+    radial-gradient(0.9px 0.9px at 17.7% 13.4%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 80.0% 15.3%, #b9c9e6, transparent 100%),
+    radial-gradient(1.2px 1.2px at 65.4% 35.3%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 3.1% 79.3%, #ffffff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 52.6% 92.5%, #ffffff, transparent 100%),
+    radial-gradient(1.1px 1.1px at 82.0% 21.7%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 50.1% 75.8%, #b9c9e6, transparent 100%),
+    radial-gradient(1.0px 1.0px at 82.8% 7.0%, #b9c9e6, transparent 100%),
+    radial-gradient(1.2px 1.2px at 65.9% 80.9%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 53.1% 52.3%, #ffffff, transparent 100%),
+    radial-gradient(0.9px 0.9px at 77.1% 60.6%, #b9c9e6, transparent 100%),
+    radial-gradient(1.2px 1.2px at 17.9% 47.4%, #ffffff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 32.9% 51.8%, #ffffff, transparent 100%),
+    radial-gradient(1.1px 1.1px at 87.6% 6.6%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 76.7% 50.8%, #ffffff, transparent 100%),
+    radial-gradient(1.1px 1.1px at 44.4% 61.0%, #ffffff, transparent 100%),
+    radial-gradient(1.1px 1.1px at 68.9% 45.3%, #ffffff, transparent 100%),
+    radial-gradient(1.1px 1.1px at 50.8% 25.3%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 91.4% 88.5%, #b9c9e6, transparent 100%),
+    radial-gradient(1.0px 1.0px at 14.4% 12.9%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 66.8% 43.0%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 77.8% 88.9%, #b9c9e6, transparent 100%),
+    radial-gradient(1.0px 1.0px at 15.0% 87.5%, #b9c9e6, transparent 100%),
+    radial-gradient(1.3px 1.3px at 74.2% 10.2%, #ffffff, transparent 100%),
+    radial-gradient(1.3px 1.3px at 98.0% 82.6%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 98.4% 40.6%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 32.2% 71.8%, #b9c9e6, transparent 100%),
+    radial-gradient(0.9px 0.9px at 44.2% 2.8%, #b9c9e6, transparent 100%),
+    radial-gradient(1.0px 1.0px at 51.2% 7.3%, #b9c9e6, transparent 100%),
+    radial-gradient(1.3px 1.3px at 96.2% 11.3%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 89.8% 18.8%, #ffffff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 84.3% 67.2%, #b9c9e6, transparent 100%),
+    radial-gradient(1.3px 1.3px at 15.6% 91.1%, #b9c9e6, transparent 100%),
+    radial-gradient(1.1px 1.1px at 9.8% 6.6%, #b9c9e6, transparent 100%),
+    radial-gradient(1.2px 1.2px at 88.7% 27.4%, #b9c9e6, transparent 100%),
+    radial-gradient(0.9px 0.9px at 79.6% 9.2%, #ffffff, transparent 100%),
+    radial-gradient(1.2px 1.2px at 26.9% 12.9%, #ffffff, transparent 100%),
+    radial-gradient(0.9px 0.9px at 91.8% 27.3%, #b9c9e6, transparent 100%),
+    radial-gradient(1.0px 1.0px at 92.9% 96.0%, #ffffff, transparent 100%),
+    radial-gradient(1.0px 1.0px at 20.8% 31.6%, #ffffff, transparent 100%);
+  background-repeat:repeat;
+  background-size:260px 260px;
+}
+body.day-mode { background-color:#03050c; }
+
+/* ─ القمر بالفضاء (خلف الكوكب) — عنصر CSS خفيف بدون أي صور أو تكلفة رندر ─ */
+#spaceMoon {
+  position:fixed; top:8%; left:12%; width:64px; height:64px; border-radius:50%;
+  pointer-events:none; z-index:0; display:none;
+  background:radial-gradient(circle at 38% 34%, #ffffff 0%, #e7ecf5 35%, #b9c4d6 60%, rgba(185,196,214,0) 78%);
+  box-shadow:0 0 34px 10px rgba(220,228,245,0.28), 0 0 70px 24px rgba(220,228,245,0.12);
+}
+#map { width:100vw; height:100vh; will-change:transform; background:transparent; }
+.maplibregl-canvas-container, .maplibregl-canvas { background:transparent!important; }
 .maplibregl-canvas { will-change:transform; }
 .maplibregl-marker { will-change:transform; }
 .maplibregl-ctrl-attrib,.maplibregl-ctrl-logo,.maplibregl-ctrl-group { display:none!important; }
@@ -177,7 +290,10 @@ body.day-mode .ov-route {
 /* ─── نتائج البحث والمفضلة (تظهر داخل البطاقة السفلية نفسها) ─── */
 #reportFab.on { background:rgba(251,191,36,0.16); border-color:rgba(251,191,36,0.75); box-shadow:0 0 16px rgba(251,191,36,0.35); }
 #spClear { background:none;background-color:transparent;-webkit-appearance:none;appearance:none;border:none;cursor:pointer;padding:2px;display:none; }
-#spClear svg { width:16px;height:16px;stroke:#475569; }
+#spClear svg { width:16px;height:16px;stroke:#475569;display:none; }
+#spClear .sp-icon-back { display:block; }
+#spClear.show-x .sp-icon-back { display:none; }
+#spClear.show-x .sp-icon-x { display:block; }
 .sp-hint-txt { font-size:11px;color:#475569;text-align:center; }
 #spResults { display:flex;flex-direction:column;gap:3px;max-height:230px;overflow-y:auto; }
 .spRes {
@@ -256,8 +372,25 @@ body.day-mode .ov-route {
 }
 .quick-sheet::-webkit-scrollbar { display:none; }
 .quick-sheet.qs-hidden { display:none; }
-/* أثناء وضع البحث: البطاقة تنفتح بطول شاشة كبير دائماً (حتى لو المحتوى قصير)، وتصير قابلة للتمرير بداخلها */
-.quick-sheet.qs-search-active { min-height:78vh; max-height:82vh; }
+/* أثناء وضع البحث: البطاقة تصير صفحة مستقلة كاملة الشاشة (بحث + زر رجوع)، بدل بطاقة سفلية جزئية */
+.quick-sheet.qs-search-active {
+  top:0; height:100dvh; min-height:100dvh; max-height:100dvh;
+  border-radius:0; border-top:none; z-index:1006;
+  padding-top:calc(10px + env(safe-area-inset-top, 0px));
+}
+.quick-sheet.qs-search-active .qs-handle { display:none; }
+
+/* رأس صفحة البحث الكاملة — زر رجوع واضح + عنوان، يظهر فقط أثناء وضع البحث */
+.qs-fullpage-header { display:none; align-items:center; gap:10px; padding:2px 2px 14px; }
+.quick-sheet.qs-search-active .qs-fullpage-header { display:flex; }
+.qs-back-btn {
+  display:flex; align-items:center; gap:6px; background:none; border:none; cursor:pointer;
+  padding:6px 4px; color:#e2e8f0; font-family:'Cairo',sans-serif; font-size:14.5px; font-weight:700;
+}
+.qs-back-btn svg { width:20px; height:20px; stroke:#4ade80; }
+.qs-fullpage-title { flex:1; text-align:center; margin-inline-end:34px; font-family:'Cairo',sans-serif; font-size:15.5px; font-weight:800; color:#e2e8f0; }
+body.day-mode .qs-back-btn { color:#1e293b; }
+body.day-mode .qs-fullpage-title { color:#1e293b; }
 .qs-handle { display:flex; justify-content:center; padding:9px 0 12px; cursor:grab; touch-action:none; }
 .qs-handle:active { cursor:grabbing; }
 .qs-handle span { width:38px; height:4px; border-radius:3px; background:rgba(255,255,255,0.28); transition:background .2s, width .2s; }
@@ -833,6 +966,33 @@ body.day-mode .ss-title { color:#1e293b; }
 body.day-mode .ss-opt-ic { background:rgba(0,0,0,0.04); border-color:rgba(0,0,0,0.07); }
 body.day-mode .ss-opt span { color:#334155; }
 body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); color:#334155; }
+
+/* ─── عداد السرعة الرقمي (دائرة متقطعة تتغيّر لونها + رقم بالمنتصف) ─── */
+#speedHUD {
+  width:86px; height:86px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center; position:fixed;
+  background:rgba(10,14,26,0.88); backdrop-filter:blur(14px);
+  box-shadow:0 4px 16px rgba(0,0,0,0.45);
+}
+#speedHUD svg { position:absolute; top:0; left:0; width:86px; height:86px; }
+#speedHUD .sg-ring {
+  fill:none; stroke:#ffffff; stroke-width:4;
+  stroke-dasharray:6 6; stroke-linecap:round;
+  transition: stroke .25s ease;
+}
+#speedGaugeNum {
+  position:relative; z-index:1;
+  font-family:'Cairo',sans-serif; font-weight:900; font-size:26px;
+  color:#e2e8f0; line-height:1; transition: color .25s ease;
+}
+#speedGaugeUnit {
+  position:absolute; z-index:1; bottom:14px; left:0; right:0; text-align:center;
+  font-family:'Cairo',sans-serif; font-weight:700; font-size:9px;
+  color:#4ade80;
+}
+body.day-mode #speedHUD { background:rgba(255,255,255,0.92); box-shadow:0 4px 16px rgba(15,23,42,0.12); }
+body.day-mode #speedHUD .sg-ring { stroke:#0f172a; }
+body.day-mode #speedGaugeNum { color:#1e293b; }
 </style>
 </head>
 <body>
@@ -959,6 +1119,9 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
     <button class="ss-cancel" id="ssCancelBtn">إلغاء</button>
   </div>
 </div>
+
+<!-- القمر بالفضاء — يظهر بوضع الليل، خلف الكوكب عند الابتعاد -->
+<div id="spaceMoon"></div>
 
 <div id="map"></div>
 
@@ -1109,9 +1272,13 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
   <div style="font-size:11px;color:#475569;text-align:center;">سيُضاف البلاغ مباشرة على موقعك الحالي</div>
 </div>
 
-<!-- عداد السرعة (نصف دائرة مع إبرة ودرجات وأرقام، بألوان أخضر→أصفر→برتقالي→أحمر) -->
-<div id="speedHUD" style="position:fixed;bottom:160px;left:10px;z-index:998;display:none;cursor:pointer;">
-  <svg id="speedGaugeSvg" width="118" height="81" viewBox="0 0 220 150"></svg>
+<!-- عداد السرعة الرقمي: دائرة بيضاء متقطعة تتغيّر لونها حسب السرعة (أبيض عادي، أصفر عند 50، برتقالي عند 80، أحمر بعد 80) ورقم رقمي بالمنتصف -->
+<div id="speedHUD" style="bottom:160px;left:10px;z-index:998;display:none;cursor:pointer;">
+  <svg id="speedGaugeSvg" viewBox="0 0 86 86">
+    <circle class="sg-ring" id="speedRingCircle" cx="43" cy="43" r="38"></circle>
+  </svg>
+  <div id="speedGaugeNum">0</div>
+  <div id="speedGaugeUnit">km/h</div>
 </div>
 
 <!-- مثلث الإبلاغات العائم — يظهر بيمين الشاشة أثناء الملاحة لوصول سريع لنفس قائمة البلاغات -->
@@ -1230,6 +1397,14 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
       <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="gauge" style="width:18px;height:18px;"></i> حد السرعة</span>
       <span id="speedLimitVal" style="font-size:11px;color:#64748b;">80 كم/س</span>
     </button>
+
+    <button id="btnDownloadIraqDB" style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-radius:12px;border:1px solid rgba(96,165,250,0.35);background:rgba(96,165,250,0.08);color:#93c5fd;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">
+      <span style="display:flex;align-items:center;gap:10px;"><i data-lucide="database" style="width:18px;height:18px;"></i> تحميل قاعدة بيانات العراق للبحث</span>
+      <span id="dbDownloadState" style="font-size:11px;color:#64748b;">لم تُحمّل بعد</span>
+    </button>
+    <div style="font-size:11px;color:#64748b;line-height:1.7;padding:0 4px;">
+      تحميل لمرة وحدة (يحتاج انترنت جيد ويأخذ دقيقة تقريباً): مستشفيات، عيادات، صيدليات، مراكز شرطة، دوائر حكومية وبلديات، مدارس، جامعات، مساجد، بنوك، مناطق وأحياء، والشوارع الرئيسية بكل العراق — بعدها تظهر بالبحث فوراً حتى بدون انترنت.
+    </div>
   </div>
 
   <!-- صفحة الحساب -->
@@ -1323,10 +1498,20 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
 <!-- ══════════ البطاقة السفلية المنسدلة — شريط بسيط بارز بالأسفل دائماً، واسحبه بإصبعك لفوق لتنبثق البطاقة كاملة (بحث + كل الأزرار) ══════════ -->
 <div class="quick-sheet" id="quickSheet">
   <div class="qs-handle" id="bbHandle"><span></span></div>
+  <div class="qs-fullpage-header" id="qsFullpageHeader">
+    <button type="button" class="qs-back-btn" id="qsBackBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      رجوع
+    </button>
+    <span class="qs-fullpage-title">بحث</span>
+  </div>
   <div class="qs-search" id="btnSearch">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35" stroke-linecap="round"/></svg>
     <input id="spInput" class="qs-search-input" type="text" placeholder="إلى أين؟" autocomplete="off" />
-    <button id="spClear" type="button"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg></button>
+    <button id="spClear" type="button">
+      <svg class="sp-icon-back" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M9 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg class="sp-icon-x" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/></svg>
+    </button>
   </div>
   <div id="qsSearchResults">
     <div class="sp-hint-txt" id="spHintTxt">ابحث عن منطقة في العراق لتحديد المسار إليها</div>
@@ -1375,6 +1560,10 @@ body.day-mode .ss-cancel { background:#fff; border-color:rgba(15,23,42,0.08); co
     <button class="qs-card" id="btnLocate" data-tip="موقعي">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke-linecap="round"/><circle cx="12" cy="12" r="7" stroke-dasharray="2 2"/></svg>
       <span>موقعي</span>
+    </button>
+    <button class="qs-card" id="btnGlobe" data-tip="عرض الكوكب">
+      <i data-lucide="globe-2"></i>
+      <span>الكوكب</span>
     </button>
     <button class="qs-card" id="btn3D" data-tip="عرض ثلاثي الأبعاد">
       <i data-lucide="box"></i>
@@ -1512,6 +1701,9 @@ function buildMapModeLayers(mode) {
 
   const layers = [
     { id:P+'bg', type:'background', paint:{ 'background-color': C.bg } },
+    // ─ تظليل جبال/وديان خفيف — طبقة أساس تحت المسطّحات والمباني، تظهر فقط وأنت مقرّب على الأرض (زوم 7+) ─
+    { id:P+'hillshade', type:'hillshade', source:'terrainDem', minzoom:7,
+      paint:{ 'hillshade-exaggeration':0.22, 'hillshade-shadow-color': dark?'#0a0f1c':'#3a4048', 'hillshade-highlight-color': dark?'#3a4a68':'#ffffff', 'hillshade-accent-color':'#4b5a72', 'hillshade-illumination-direction':315 } },
     { id:P+'landuse-residential', type:'fill', source:OFM_SOURCE_ID, 'source-layer':'landuse',
       filter:['==',['get','class'],'residential'], paint:{ 'fill-color': C.landuse, 'fill-opacity': dark?0.55:0.6 } },
     { id:P+'landuse-green', type:'fill', source:OFM_SOURCE_ID, 'source-layer':'landuse',
@@ -1727,15 +1919,53 @@ maplibregl.setRTLTextPlugin(
   true // lazy load: يتحمّل بس أول ما تظهر تسمية RTL على الخريطة
 );
 
+// ══════════════════════════════════════════════
+// TILE CACHE — تنزيل بلاطات الخريطة (المتجهة + القمر الصناعي + الخطوط) محلياً على الجهاز
+// أول مرة تفتح منطقة تنزل من النت وتنخزن بالـ Cache Storage، وبعدها كل رجوع لنفس المنطقة
+// يكون فوري من تخزين الجهاز نفسه بدون انتظار شبكة — سرعة فتح/تحريك خرافية بعد أول استخدام
+// ══════════════════════════════════════════════
+const TILE_CACHE_NAME = 'sqoor-map-tiles-v1';
+maplibregl.addProtocol('cache', async (params, abortController) => {
+  const realUrl = params.url.slice('cache://'.length);
+  let cache = null;
+  try { cache = await caches.open(TILE_CACHE_NAME); } catch (e) {}
+  let resp = null;
+  if (cache) { try { resp = await cache.match(realUrl); } catch (e) {} }
+  if (!resp) {
+    resp = await fetch(realUrl, { signal: abortController.signal });
+    if (resp && resp.ok && cache) {
+      try { cache.put(realUrl, resp.clone()); } catch (e) {}
+    }
+  }
+  if (!resp || !resp.ok) throw new Error('تعذّر تحميل البلاطة: ' + realUrl);
+  if (params.type === 'json') return { data: await resp.json() };
+  return { data: await resp.arrayBuffer() };
+});
+
 const map = new maplibregl.Map({
   container: 'map',
+  // يمرّر كل طلبات بلاطات/خطوط/سبرايت الخريطة عبر بروتوكول التخزين المحلي أعلاه —
+  // يشمل هذا أيضاً بلاطات المتجهات الفعلية بعد ما تُحل من رابط TileJSON، مو بس الرابط الأولي
+  transformRequest: (url, resourceType) => {
+    if (/^https?:\/\//.test(url) &&
+        ['Tile','Source','Glyphs','SpriteImage','SpriteJSON'].includes(resourceType)) {
+      return { url: 'cache://' + url };
+    }
+  },
   style: {
     version: 8,
     glyphs: 'https://tiles.openfreemap.org/fonts/{fontstack}/{range}.pbf',
+    // ─ عرض كرة أرضية ثلاثية الأبعاد عند الابتعاد (تتحول تلقائياً لخريطة مسطحة تقريباً بزوم 12+) ─
+    projection: { type: 'globe' },
+    sky: {
+      'atmosphere-blend': ['interpolate', ['linear'], ['zoom'], 0, 0.18, 5, 0.18, 7, 0]
+    },
     sources: {
       [OFM_SOURCE_ID]: { type:'vector', url:'https://tiles.openfreemap.org/planet' },
       satellite: { type:'raster', tiles: SAT_TILES,   tileSize:256, maxzoom:19, attribution:'Esri' },
-      satLabels: { type:'raster', tiles: SAT_LABELS,  tileSize:256, maxzoom:19 }
+      satLabels: { type:'raster', tiles: SAT_LABELS,  tileSize:256, maxzoom:19 },
+      // ─ مصدر ارتفاعات مجاني (AWS Terrarium) لتظليل التضاريس — بدون مفتاح API ─
+      terrainDem: { type:'raster-dem', tiles:['https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'], tileSize:256, encoding:'terrarium', maxzoom:15 }
     },
     layers: [
       ...NIGHT_LAYERS.filter(l => !IS_LABEL_ID(l.id)),
@@ -1748,7 +1978,8 @@ const map = new maplibregl.Map({
     ]
   },
   center: [44.3661, 33.3152],
-  zoom: 13, pitch:0, bearing:0, antialias:false,
+  // ─ تفتح الخريطة مباشرة بمنظر الكرة الأرضية الكاملة عند تشغيل التطبيق، وتقترب تلقائياً لموقعك فور تحديده ─
+  zoom: 0.7, pitch:0, bearing:0, antialias:false,
   // ─ إعدادات أداء قصوى لخريطة فائقة السرعة والسلاسة ─
   fadeDuration: 0,
   renderWorldCopies: false,
@@ -1756,8 +1987,21 @@ const map = new maplibregl.Map({
   refreshExpiredTiles: false,
   attributionControl: false,
   crossSourceCollisions: false,
-  trackResize: true
+  trackResize: true,
+  // إيماءات التدوير/الإمالة بإصبعين مقفولة — البرنامج نفسه يتحكم بالميلان والاتجاه برمجياً (زر 3D)،
+  // وتعطيل هذي الإيماءات يمنع أي تدوير/إمالة غير مقصود بيد المستخدم (سبب رئيسي لتهنيج/تقطيع مؤقت بالخريطة)
+  dragRotate: false,
+  pitchWithRotate: false,
+  touchPitch: false
 });
+
+// تحديد كثافة البكسل (Pixel Ratio) بحد أقصى 2 بدل الاعتماد على كثافة الشاشة الفعلية (قد تصل 3-4
+// بهواتف حديثة) — هذا يقلل عدد البكسلات اللي لازم الـ GPU يرسمها كل إطار بشكل كبير على الأجهزة
+// عالية الدقة، وهو من أكبر أسباب بطء/تقطيع خرائط الويب على الجوال، بدون فرق يُلاحظ بالوضوح فعلياً
+if (typeof map.setPixelRatio === 'function') {
+  map.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+}
+
 
 // دالة مساعدة: إظهار/إخفاء مجموعة طبقات دفعة وحدة
 function setLayersVisible(ids, visible) {
@@ -2594,7 +2838,7 @@ const TURN_ARROW_FWD_M  = 14; // نضع الرأس بعد الزاوية بقل�
 const HEAD_ICON_PX  = 44;
 const HEAD_PXRATIO  = 2;
 // حجم رأس السهم على الخريطة بحيث تكون قاعدته بعرض قريب من سماكة خط المسار
-const HEAD_ICON_SIZE = (ROUTE_WIDTH_PX * 1.85) / ((HEAD_ICON_PX * 0.62) / HEAD_PXRATIO);
+const HEAD_ICON_SIZE = ((ROUTE_WIDTH_PX * 1.85) / ((HEAD_ICON_PX * 0.62) / HEAD_PXRATIO)) * 0.88;
 
 // رأس سهم واضح وممتلئ، طرفه عند أعلى الكانفاس (نقطة الارتكاز).
 // يبقى رأسه مثبتاً على نهاية الساق ويدور مع اتجاه الشارع بعد المنعطف.
@@ -2608,11 +2852,12 @@ function buildArrowHeadIcon() {
   ctx.shadowBlur = 3;
   ctx.shadowOffsetY = 1;
   ctx.beginPath();
-  // رأس مثلثي عريض؛ عرضه يلتقي مع ساق السهم قبل الزاوية
-  ctx.moveTo(size * 0.50, 0.02);
-  ctx.lineTo(size * 0.92, size * 0.64);
-  ctx.lineTo(size * 0.50, size * 0.48);
-  ctx.lineTo(size * 0.08, size * 0.64);
+  // رأس سهم أنعم: طرف مدبب حاد، وكتفين منحنيتين بدل الخطوط المستقيمة الحادة، مع تجويف خلفي بسيط
+  ctx.moveTo(size * 0.50, size * 0.03);
+  ctx.quadraticCurveTo(size * 0.74, size * 0.24, size * 0.90, size * 0.60);
+  ctx.lineTo(size * 0.50, size * 0.44);
+  ctx.lineTo(size * 0.10, size * 0.60);
+  ctx.quadraticCurveTo(size * 0.26, size * 0.24, size * 0.50, size * 0.03);
   ctx.closePath();
   ctx.fill();
   return ctx.getImageData(0, 0, size, size);
@@ -2850,7 +3095,7 @@ map.on('load', () => {
 
   map.addLayer({ id:'turn-arrows-line', type:'line', source:'turn-arrow-path',
     layout:{ 'line-join':'round','line-cap':'round' },
-    paint:{ 'line-color':'#ffffff','line-width':ROUTE_WIDTH_PX * 0.42,'line-opacity':1 }
+    paint:{ 'line-color':'#ffffff','line-width':ROUTE_WIDTH_PX * 0.34,'line-opacity':1 }
   });
   } catch(e) {}
 
@@ -3160,7 +3405,8 @@ function gotGPS(lng, lat, fallback=false) {
   if (routeReady) { checkNearTurn(lng, lat); checkNearReport(lng, lat); updateNextStreetBar(); updateLaneGuidance(lng, lat); }
 
   if (first) {
-    map.flyTo({ center:[lng, lat], zoom:15, duration:800 });
+    // حركة اقتراب بطيئة وسلسة من منظر الكوكب البعيد وصولاً لموقعك (بدل قفزة سريعة)
+    map.flyTo({ center:[lng, lat], zoom:15, duration:4500, curve:1.42, easing: t => t*(2-t), essential:true });
   }
 
   // تتبع الكاميرا — السيارة بمركز الشاشة بالضبط (بدون إزاحة للأمام)
@@ -3505,10 +3751,10 @@ function showOverview(coords, bearing) {
     if(lng<minLng)minLng=lng; if(lng>maxLng)maxLng=lng;
     if(lat<minLat)minLat=lat; if(lat>maxLat)maxLat=lat;
   });
-  const pad = 0.03;
+  const pad = 0.055;
   map.fitBounds(
     [[minLng-pad, minLat-pad],[maxLng+pad, maxLat+pad]],
-    { pitch:0, bearing:0, duration:800, padding:{top:80,bottom:280,left:50,right:50}, maxZoom:15, essential:true }
+    { pitch:0, bearing:0, duration:800, padding:{top:80,bottom:280,left:50,right:50}, maxZoom:13.3, essential:true }
   );
   const card = document.getElementById('overviewCard');
   card.style.display = 'flex'; card.style.flexDirection = 'column';
@@ -3752,11 +3998,13 @@ const OVERPASS_MIRRORS = [
   'https://overpass.openstreetmap.fr/api/interpreter'
 ];
 
-async function fetchOverpass(query) {
+async function fetchOverpass(query, externalSignal) {
   let lastErr = null;
   for (const mirror of OVERPASS_MIRRORS) {
+    if (externalSignal && externalSignal.aborted) throw new Error('aborted');
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 12000); // لا ننتظر خادم بطيء أكثر من 12 ثانية
+    if (externalSignal) externalSignal.addEventListener('abort', () => ctrl.abort(), { once: true });
+    const timer = setTimeout(() => ctrl.abort(), 5000); // فشل سريع للخادم البطيء وننتقل للمرآة التالية بدل الانتظار الطويل
     try {
       const res = await fetch(mirror, { method: 'POST', body: query, signal: ctrl.signal });
       clearTimeout(timer);
@@ -4161,6 +4409,44 @@ document.getElementById('ovCancel').onclick = () => {
 let searchTimer = null;
 let pendingDest = null;
 let pendingDestName = null;
+
+// خدمة Nominatim العامة تحجب/تتجاهل الطلبات لو وصلتها بسرعة أكثر من طلب كل ~1.1 ثانية (سياسة الاستخدام الرسمية).
+// بدون هذا التنظيم، كل بحثة وحدة تطلق عدة طلبات نومیناتیم بالتوازي/تسلسل، وبعد 3-4 عمليات بحث متتالية
+// نكون تجاوزنا الحد بسرعة فتبدأ الخدمة تتجاهل طلباتنا بصمت — وهذا سبب "يشتغل شوي ثم يتوقف ولا يرجع نتائج".
+let lastNominatimCallTs = 0;
+const NOMINATIM_MIN_GAP_MS = 1100;
+// إذا الخادم رجّع 429 (طلبات كثيرة) أو 403 (حجب)، نتوقف عن مضايقته لمدة ثابتة بدل تكرار
+// المحاولة والفشل بصمت بكل بحث جديد لبقية الجلسة — هذا هو سبب "يشتغل مرة أو مرتين ثم يتوقف نهائياً"
+let nominatimBlockedUntil = 0;
+const NOMINATIM_COOLDOWN_MS = 30 * 1000;
+function nominatimRateGate() {
+  const now = Date.now();
+  const wait = Math.max(0, lastNominatimCallTs + NOMINATIM_MIN_GAP_MS - now);
+  lastNominatimCallTs = now + wait;
+  return wait > 0 ? new Promise(res => setTimeout(res, wait)) : Promise.resolve();
+}
+
+// نلغي طلبات البحث القديمة (لسه شغالة بالخلفية) كل ما يبدأ بحث جديد، حتى لا تتراكم عشرات
+// الطلبات المتزامنة على نفس الخوادم العامة أثناء كتابة سريعة، وهذا يقلّل فرصة الحظر المؤقت.
+let activeSearchAbort = null;
+
+// ذاكرة مؤقتة (كاش) لآخر نتائج بحث لكل نص، حتى لو رجع المستخدم لنفس الكلمة لا نعيد ضرب الشبكة من جديد
+const searchResultsCache = new Map();
+const SEARCH_CACHE_TTL_MS = 3 * 60 * 1000;
+function getCachedSearch(q) {
+  const hit = searchResultsCache.get(q);
+  if (!hit) return null;
+  if (Date.now() - hit.ts > SEARCH_CACHE_TTL_MS) { searchResultsCache.delete(q); return null; }
+  return hit.arr;
+}
+function setCachedSearch(q, arr) {
+  searchResultsCache.set(q, { arr, ts: Date.now() });
+  if (searchResultsCache.size > 40) { // نمنع الذاكرة من التضخم بلا حدود
+    const oldestKey = searchResultsCache.keys().next().value;
+    searchResultsCache.delete(oldestKey);
+  }
+}
+
 const spInput   = document.getElementById('spInput');
 const spResults = document.getElementById('spResults');
 const spClear   = document.getElementById('spClear');
@@ -4178,6 +4464,7 @@ function openSearchPanel() {
   qsCards.style.display = 'none';
   qsSearchResults.style.display = 'flex';
   document.getElementById('btnSearch').classList.add('on');
+  spClear.style.display = 'block'; spClear.classList.remove('show-x');
   // نعيد إظهار صف المنزل/العمل/المفضلة وأزرار المحطات والسابقة دائماً (تحسباً إذا كانت اختفت من عملية بحث سابقة)
   document.getElementById('qsQuickRow').style.display = '';
   document.getElementById('qsSearchPoiCards').style.display = '';
@@ -4343,7 +4630,7 @@ function closeSearchPanel() {
   qsSearchResults.style.display = 'none';
   document.getElementById('quickSheet').classList.remove('qs-search-active');
   document.getElementById('btnSearch').classList.remove('on');
-  spInput.value = ''; spResults.innerHTML = ''; spClear.style.display = 'none';
+  spInput.value = ''; spResults.innerHTML = ''; spClear.style.display = 'none'; spClear.classList.remove('show-x');
   // نعيد إظهار صف المنزل/العمل/المفضلة وأزرار المحطات والسابقة دائماً، حتى لا تبقى مخفية بالمرة الجاية
   document.getElementById('qsQuickRow').style.display = '';
   document.getElementById('qsSearchPoiCards').style.display = '';
@@ -4356,6 +4643,8 @@ function closeSearchPanel() {
   document.getElementById('spHintTxt').textContent = 'ابحث عن منطقة في العراق لتحديد المسار إليها';
   if (window.quickSheetRemeasure) requestAnimationFrame(window.quickSheetRemeasure);
 }
+
+document.getElementById('qsBackBtn').onclick = () => closeSearchPanel();
 
 document.getElementById('btnSearch').onclick = function(e) {
   if (searchModeOn) {
@@ -4374,7 +4663,7 @@ document.getElementById('searchOverlay').onclick = () => {
 spInput.addEventListener('input', () => {
   clearTimeout(searchTimer);
   const q = spInput.value.trim();
-  spClear.style.display = q ? 'block' : 'none';
+  spClear.classList.toggle('show-x', !!q);
   if (q.length < 2) {
     spResults.innerHTML = '';
     document.getElementById('qsQuickRow').style.display = '';
@@ -4394,12 +4683,15 @@ spInput.addEventListener('input', () => {
   document.getElementById('recentSection').innerHTML = '';
   document.getElementById('favSection').innerHTML = '';
   spResults.innerHTML = '<div class="sp-loading"><span class="sp"></span> جاري البحث...</div>';
-  searchTimer = setTimeout(() => doSearch(q), 500);
+  searchTimer = setTimeout(() => doSearch(q), 300);
 });
 
 spClear.onclick = () => {
+  // لا يوجد نص بالبحث = العلامة بوضع سهم رجوع → نرجع للقائمة الرئيسية (نفس فعل زر الرجوع)
+  if (!spInput.value.trim()) { closeSearchPanel(); return; }
+  // فيه نص = العلامة بوضع X → نمسح النص فقط ونبقى بوضع البحث
   spInput.value = ''; spResults.innerHTML = '';
-  spClear.style.display = 'none'; spInput.focus();
+  spClear.classList.remove('show-x'); spInput.focus();
   document.getElementById('qsQuickRow').style.display = '';
   if (!showingFavoritesOnly) {
     document.getElementById('qsSearchPoiCards').style.display = '';
@@ -4413,26 +4705,120 @@ spClear.onclick = () => {
 // حدود تقريبية تغطي كل العراق (تُستخدم للبحث عن نقاط الاهتمام بالاسم بكل البلد، مو بغداد بس)
 const IRAQ_BBOX = { south: 29.0, west: 38.7, north: 37.4, east: 48.8 };
 
+// كلمات بحث عامة (فئة كاملة) — لما المستخدم يكتب "مستشفى" أو "عيادة" هو يقصد كل الأماكن
+// من هذا النوع القريبة، مو بس الأماكن اللي اسمها فعلياً يحتوي كلمة "مستشفى" حرفياً.
+// كل فئة مربوطة بوسم/قيمة OSM المطابقة حتى نجيب كل نقاط الاهتمام المصنّفة بهذا النوع.
+const CATEGORY_KEYWORDS = [
+  { words: ['مستشفى','مستشفيات'], tags: ['amenity=hospital'], label: 'مستشفى' },
+  { words: ['عياده','عيادة','عيادات'], tags: ['amenity=clinic','amenity=doctors'], label: 'عيادة' },
+  { words: ['صيدليه','صيدلية','صيدليات'], tags: ['amenity=pharmacy'], label: 'صيدلية' },
+  { words: ['مختبر','مختبرات','مختبر تحاليل'], tags: ['healthcare=laboratory'], label: 'مختبر' },
+  { words: ['مركز شرطة','مراكز شرطة','مخفر','مخفر شرطة','مخافر'], tags: ['amenity=police'], label: 'مركز شرطة' },
+  { words: ['بلديه','بلدية','بلديات'], tags: ['amenity=townhall','office=government'], label: 'بلدية' },
+  { words: ['دائرة','دوائر','دائرة حكومية'], tags: ['office=government'], label: 'دائرة حكومية' },
+  { words: ['مدرسه','مدرسة','مدارس'], tags: ['amenity=school'], label: 'مدرسة' },
+  { words: ['روضه','روضة','حضانه','حضانة'], tags: ['amenity=kindergarten'], label: 'روضة' },
+  { words: ['جامعه','جامعة','جامعات','كليه','كلية'], tags: ['amenity=university','amenity=college'], label: 'جامعة' },
+  { words: ['مطعم','مطاعم'], tags: ['amenity=restaurant'], label: 'مطعم' },
+  { words: ['مقهى','مقاهي','كافيه','كافيهات'], tags: ['amenity=cafe'], label: 'مقهى' },
+  { words: ['بنك','بنوك'], tags: ['amenity=bank'], label: 'بنك' },
+  { words: ['صراف الي','صراف آلي','ماكنة سحب','ماكنه سحب'], tags: ['amenity=atm'], label: 'صراف آلي' },
+  { words: ['مسجد','مساجد','جامع','جوامع'], tags: ['amenity=place_of_worship'], label: 'مسجد' },
+  { words: ['كنيسه','كنيسة','كنائس'], tags: ['amenity=place_of_worship'], label: 'كنيسة' },
+  { words: ['محطه وقود','محطة وقود','كازيه','كازيات','بنزينخانه','بنزينخانة'], tags: ['amenity=fuel'], label: 'محطة وقود' },
+  { words: ['فندق','فنادق'], tags: ['tourism=hotel'], label: 'فندق' },
+  { words: ['سوبر ماركت','سوبرماركت','ماركت'], tags: ['shop=supermarket'], label: 'سوبر ماركت' },
+  { words: ['مول','مولات'], tags: ['shop=mall'], label: 'مول' },
+  { words: ['حديقه','حديقة','حدائق'], tags: ['leisure=park'], label: 'حديقة' },
+  { words: ['مخبز','مخابز','فرن'], tags: ['shop=bakery'], label: 'مخبز' },
+  { words: ['منطقه','منطقة','مناطق','حي','احياء','أحياء'], tags: ['place=suburb','place=neighbourhood','place=quarter','place=village','place=town','place=hamlet','place=locality'], label: 'منطقة' },
+];
+
+function findCategoryTags(q) {
+  const qn = normalizeAr(q);
+  if (!qn) return null;
+  // نطابق فقط لو الكلمة المكتوبة بالضبط هي كلمة الفئة العامة (زي "مستشفى" لحالها)،
+  // مو أي بحث يحتوي هالكلمة كجزء من اسم مكان محدد (زي "مستشفى الجادرية الاهلي") —
+  // غير كذا بحث اسم محدد كان يتحول لعرض كل المستشفيات بدل الاسم المطلوب فعلياً
+  for (const cat of CATEGORY_KEYWORDS) {
+    if (cat.words.some(w => normalizeAr(w) === qn)) return cat;
+  }
+  return null;
+}
+
+// ترجمة تصنيف OSM (بالإنكليزي زي hospital/pharmacy) لعربي مفهوم، بدل ما يبين بالنتيجة بالإنكليزي
+const KIND_LABELS_AR = {
+  hospital:'مستشفى', clinic:'عيادة', doctors:'عيادة', pharmacy:'صيدلية', laboratory:'مختبر',
+  school:'مدرسة', kindergarten:'روضة', university:'جامعة', college:'كلية',
+  restaurant:'مطعم', cafe:'مقهى', fast_food:'وجبات سريعة', bakery:'مخبز',
+  bank:'بنك', atm:'صراف آلي', place_of_worship:'مسجد', fuel:'محطة وقود',
+  hotel:'فندق', supermarket:'سوبر ماركت', mall:'مول', park:'حديقة',
+  pitch:'ملعب', stadium:'ملعب', police:'مركز شرطة', townhall:'بلدية',
+  government:'دائرة حكومية', suburb:'منطقة', neighbourhood:'منطقة', quarter:'منطقة',
+  town:'قضاء', village:'قرية', hamlet:'منطقة', locality:'منطقة'
+};
+function kindLabel(kind) { return KIND_LABELS_AR[kind] || kind; }
+
+// أحرف عربية لها أكثر من شكل شائع بالكتابة الفعلية (همزات الألف، التاء المربوطة/الهاء، الألف المقصورة/الياء...)
+// اسم نفس المكان قد يكون مسجّل بالخريطة بشكل مختلف شوي عن اللي يكتبه المستخدم، فنطابق أي شكل منها
+const AR_LETTER_EQUIV = {
+  'ا': '[اأإآ]', 'أ': '[اأإآ]', 'إ': '[اأإآ]', 'آ': '[اأإآ]',
+  'ه': '[هة]',   'ة': '[هة]',
+  'ي': '[يى]',   'ى': '[يى]',
+  'و': '[وؤ]',   'ؤ': '[وؤ]',
+  'ئ': '[ئي]'
+};
+// نسمح بتشكيل اختياري بين أي حرفين (بعض أسماء الخريطة نادراً ما تحتوي تشكيل)
+const AR_OPTIONAL_DIACRITICS = '[\\u064B-\\u0652\\u0670]*';
+
+function flexifyArabicWord(word) {
+  let core = word;
+  let prefix = '';
+  // "ال" التعريف ممكن تكون موجودة بكتابة المستخدم وناقصة بالاسم المسجل بالخريطة أو العكس
+  if (core.length > 3 && core.slice(0, 2) === 'ال') {
+    prefix = '(?:ال)?';
+    core = core.slice(2);
+  }
+  const escaped = core.split('').map(ch => AR_LETTER_EQUIV[ch] || ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return prefix + escaped.join(AR_OPTIONAL_DIACRITICS);
+}
+
+// نبني من نص البحث نمط مطابقة "مرن": يتطلب وجود كل كلمة من كلمات البحث بأي ترتيب
+// داخل الاسم، بدل مطابقة الجملة حرفياً بنفس الترتيب والمسافات — يلتقط أسماء مطابقة
+// فعلياً بس مكتوبة بترتيب/تفاصيل مختلفة شوي عن المكتوب بالخريطة (بحث "طبيعي" أكثر)
+function buildFuzzyRegex(q) {
+  const words = q.trim().split(/\s+/).map(w => w.replace(/["\\]/g, '')).filter(w => w.length >= 2);
+  if (!words.length) return flexifyArabicWord(q.replace(/["\\]/g, ''));
+  return words.map(w => `(?=.*${flexifyArabicWord(w)})`).join('') + '.*';
+}
+
 // بحث إضافي عن نقاط اهتمام (مطاعم/محلات/مقاهي/إلخ) اسمها يحتوي كلمة البحث بكل العراق —
 // يلتقط أماكن كثيرة ما تظهر ببحث Nominatim العادي لأنها غير مسجّلة كعنوان بس كنقطة POI باسمها
-async function overpassNameSearch(q) {
+// + لو الكلمة فئة عامة (مستشفى/عيادة/صيدلية...) نجيب كل نقاط هذا النوع بالوسم أيضاً، مو بس
+// اللي اسمها يحتوي الكلمة حرفياً — عشان تظهر كل المستشفيات/العيادات القريبة فعلاً.
+async function overpassNameSearch(q, signal) {
   const b = IRAQ_BBOX;
   const bbox = `${b.south},${b.west},${b.north},${b.east}`;
-  const esc = q.replace(/["\\]/g, '');
-  const query = `[out:json][timeout:12];(
-    nwr["name"~"${esc}",i](${bbox});
-    nwr["name:ar"~"${esc}",i](${bbox});
-  );out center 20;`;
+  const fuzzy = buildFuzzyRegex(q);
+  const cat = findCategoryTags(q);
+  const catClauses = cat ? cat.tags.map(t => `nwr[${t}](${bbox});`).join('\n    ') : '';
+  const outLimit = cat ? 200 : 80; // بحث الفئة يرجع نتائج أكثر طبيعياً (كل مستشفيات/عيادات العراق)
+  const query = `[out:json][timeout:25];(
+    nwr["name"~"${fuzzy}",i](${bbox});
+    nwr["name:ar"~"${fuzzy}",i](${bbox});
+    ${catClauses}
+  );out center ${outLimit};`;
   try {
-    const data = await fetchOverpass(query);
+    const data = await fetchOverpass(query, signal);
     const elements = data.elements || [];
     return elements.map(el => {
       const lat = el.lat ?? el.center?.lat;
       const lon = el.lon ?? el.center?.lon;
       if (lat == null || lon == null) return null;
       const tags = el.tags || {};
-      const name = tags['name:ar'] || tags.name || q;
-      const kind = tags.amenity || tags.shop || tags.tourism || tags.office || '';
+      const kind = kindLabel(tags.amenity || tags.shop || tags.tourism || tags.office || tags.leisure || tags.healthcare || '');
+      // لو ما إله اسم مسجل (شائع بمستشفيات/عيادات صغيرة)، نستخدم اسم الفئة العربي كبديل بدل ترك المكان بلا اسم
+      const name = tags['name:ar'] || tags.name || (cat ? cat.label : q);
       return { lat, lon, display_name: name + (kind ? '، ' + kind : '') + '، العراق', name, kind };
     }).filter(Boolean);
   } catch (e) {
@@ -4440,43 +4826,91 @@ async function overpassNameSearch(q) {
   }
 }
 
-async function doSearch(q) {
+
+// تبسيط النص العربي للمقارنة (إزالة التشكيل وتوحيد أشكال الألف/التاء المربوطة/الياء)
+// حتى تلتقط المطابقة حتى لو المستخدم كتب الاسم بشكل مختلف شوي عن المكتوب على الخريطة
+function normalizeAr(s) {
+  return (s || '')
+    .replace(/[\u064B-\u0652\u0670]/g, '')      // تشكيل
+    .replace(/[إأآا]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/ة/g, 'ه')
+    .replace(/ؤ/g, 'و')
+    .replace(/ئ/g, 'ي')
+    .trim().toLowerCase();
+}
+
+// بحث فوري (بدون انترنت) بكل الأسماء الموجودة فعلاً على الخريطة حالياً —
+// أماكن (مدن/أحياء)، نقاط اهتمام (poi)، وأسماء شوارع — من بلاطات الخريطة المحمّلة أصلاً بالذاكرة.
+// يشتغل فوراً لحظة الكتابة قبل ما توصل نتائج Nominatim/Overpass من الانترنت،
+// ويضمن أي اسم ظاهر على الخريطة (حتى لو ما يطلعه بحث Nominatim العادي) يظهر بالنتائج.
+function queryMapNames(q) {
+  const qn = normalizeAr(q);
+  if (!qn) return [];
+  const cat = findCategoryTags(q);
+  // القيم المتوقعة بحقل class/subclass ببلاطات الخريطة لهذه الفئة (مأخوذة من قيمة الوسم بعد =)
+  const classHints = cat ? cat.tags.map(t => t.split('=')[1]) : [];
+  // كلمات البحث منفصلة — نطابق لو كل كلمة موجودة بالاسم بأي ترتيب، مو الجملة كاملة بنفس الترتيب
+  const qTokens = qn.split(/\s+/).filter(Boolean);
+  let feats = [];
   try {
-    let viewbox;
-    if (userPos) {
-      const [lng, lat] = userPos;
-      const d = 0.6; // نطاق واسع (~65 كم) حول موقعك الحالي لترجيح النتائج القريبة أولاً
-      viewbox = `${lng - d},${lat + d},${lng + d},${lat - d}`;
-    }
-    // نفس أسلوب البحث الاحتياطي المستخدم بالتنقل الصوتي — نجرب عدة صيغ من الأكثر
-    // تحديداً للأكثر مرونة، لأن مناطق ومحلات كثيرة بالعراق مو مسجلة بنفس الاسم
-    // أو تحتاج صيغة مختلفة بقاعدة بيانات OpenStreetMap
-    // كل المحاولات مقيّدة بالعراق (countrycodes: iq) — ما نعرض نتائج من برة العراق أبداً
-    const attempts = [
-      { q: q + ' العراق', countrycodes: 'iq', viewbox, limit: 14 },
-      { q, countrycodes: 'iq', viewbox, limit: 14 },
-      { q: q + ' العراق', countrycodes: 'iq', limit: 14 },
-      { q, countrycodes: 'iq', limit: 14 }
-    ];
+    ['poi', 'place', 'transportation_name'].forEach(layer => {
+      feats = feats.concat(map.querySourceFeatures(OFM_SOURCE_ID, { sourceLayer: layer }));
+    });
+  } catch (e) { return []; }
 
-    // نشغّل كل محاولات Nominatim بالتوازي مع بحث Overpass عن نقاط الاهتمام بالاسم —
-    // هذا يزيد كمية الاحتمالات الظاهرة (مطاعم/محلات بأسمائها) بدل ما نعتمد بحث العناوين بس
-    const [nominatimResults, overpassResults] = await Promise.all([
-      (async () => {
-        for (const a of attempts) {
-          try {
-            const arr = await nominatimSearch(a.q, a);
-            if (arr && arr.length) return arr;
-          } catch (e) { /* نتجاهل ونجرب المحاولة التالية */ }
-        }
-        return [];
-      })(),
-      overpassNameSearch(q)
-    ]);
+  const seen = new Set();
+  const results = [];
+  for (const f of feats) {
+    const props = f.properties || {};
+    const name = props['name:ar'] || props.name;
+    const cls = (props.class || '').toLowerCase();
+    const subcls = (props.subclass || '').toLowerCase();
+    const nameNorm = name ? normalizeAr(name) : '';
+    const matchesName = name && qTokens.every(t => nameNorm.includes(t));
+    const matchesCategory = cat && (classHints.includes(cls) || classHints.includes(subcls));
+    if (!matchesName && !matchesCategory) continue;
+    const geom = f.geometry;
+    if (!geom || geom.type !== 'Point' || !Array.isArray(geom.coordinates)) continue;
+    const [lon, lat] = geom.coordinates;
+    if (typeof lon !== 'number' || typeof lat !== 'number') continue;
+    const displayName = name || (cat ? cat.label : q);
+    const key = displayName + '|' + lon.toFixed(4) + '|' + lat.toFixed(4);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const kind = kindLabel(props.class || props.subclass || '');
+    results.push({ lat, lon, display_name: displayName + (kind ? '، ' + kind : '') + '، العراق', name: displayName, kind, fromMap: true });
+    if (results.length >= (cat ? 40 : 25)) break;
+  }
+  return results;
+}
 
-    // دمج النتائج مع إزالة التكرار (نفس المكان تقريباً — فرق أقل من ~40 متر)
-    const merged = [...nominatimResults];
-    overpassResults.forEach(op => {
+// رقم يزيد مع كل بحث جديد — يمنع ظهور نتائج بحث قديم متأخر فوق نتائج بحث أحدث
+let searchReqId = 0;
+
+function renderSearchResults(arr) {
+  spResults.innerHTML = '';
+  if (!arr || !arr.length) {
+    spResults.innerHTML = '<div class="sp-empty">لا توجد نتائج، جرب كلمة أخرى</div>'; return;
+  }
+  arr.forEach(item => {
+    const parts = item.display_name.split(',');
+    const name  = parts.slice(0,2).join('، ');
+    const sub   = parts.slice(2,4).join('، ');
+    const d = document.createElement('div');
+    d.className = 'spRes';
+    d.innerHTML = `
+      <div class="spRes-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="rgba(74,222,128,0.2)" stroke="#4ade80"/></svg></div>
+      <div><div class="spRes-name">${name}</div><div class="spRes-sub">${sub}</div></div>`;
+    d.onclick = () => handlePlacePicked(parseFloat(item.lon), parseFloat(item.lat), name, sub);
+    spResults.appendChild(d);
+  });
+}
+
+function mergePlaces(base, cap, ...extras) {
+  const merged = [...base];
+  extras.forEach(extra => {
+    (extra || []).forEach(op => {
       const dup = merged.some(n => {
         const dLat = Math.abs(parseFloat(n.lat) - op.lat);
         const dLon = Math.abs(parseFloat(n.lon) - op.lon);
@@ -4484,27 +4918,282 @@ async function doSearch(q) {
       });
       if (!dup) merged.push({ lat: op.lat, lon: op.lon, display_name: op.display_name });
     });
+  });
+  return merged.slice(0, cap);
+}
 
-    const arr = merged.slice(0, 18); // سقف معقول لعدد النتائج المعروضة دفعة وحدة
+// ══════════════════════════════════════════════
+// قاعدة بيانات العراق المحلية — تُحمّل مرة وحدة (بضغطة زر بالإعدادات) وتُخزّن على الجهاز،
+// حتى تظهر المستشفيات/العيادات/الصيدليات/مراكز الشرطة/الدوائر الحكومية/المدارس/المناطق/الشوارع
+// الرئيسية بالبحث فوراً وبدون انترنت، ولا تعتمد فقط على استجابة خوادم Nominatim/Overpass العامة لحظتها
+// ══════════════════════════════════════════════
+const OFFLINE_DB_KEY = 'sqoor_offline_db_v1';
+const OFFLINE_DB_TS_KEY = 'sqoor_offline_db_ts';
 
-    spResults.innerHTML = '';
-    if (!arr || !arr.length) {
-      spResults.innerHTML = '<div class="sp-empty">لا توجد نتائج، جرب كلمة أخرى</div>'; return;
-    }
-    arr.forEach(item => {
-      const parts = item.display_name.split(',');
-      const name  = parts.slice(0,2).join('، ');
-      const sub   = parts.slice(2,4).join('، ');
-      const d = document.createElement('div');
-      d.className = 'spRes';
-      d.innerHTML = `
-        <div class="spRes-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="rgba(74,222,128,0.2)" stroke="#4ade80"/></svg></div>
-        <div><div class="spRes-name">${name}</div><div class="spRes-sub">${sub}</div></div>`;
-      d.onclick = () => handlePlacePicked(parseFloat(item.lon), parseFloat(item.lat), name, sub);
-      spResults.appendChild(d);
+const OFFLINE_DB_CATEGORIES = [
+  { label: 'مستشفيات',            tags: ['amenity=hospital'] },
+  { label: 'عيادات',               tags: ['amenity=clinic', 'amenity=doctors'] },
+  { label: 'صيدليات',              tags: ['amenity=pharmacy'] },
+  { label: 'مراكز شرطة',           tags: ['amenity=police'] },
+  { label: 'دوائر وبلديات حكومية', tags: ['amenity=townhall', 'office=government'] },
+  { label: 'مدارس',                tags: ['amenity=school'] },
+  { label: 'جامعات وكليات',        tags: ['amenity=university', 'amenity=college'] },
+  { label: 'مساجد وجوامع',         tags: ['amenity=place_of_worship'] },
+  { label: 'بنوك وصرافات',         tags: ['amenity=bank', 'amenity=atm'] },
+  { label: 'مناطق وأحياء',         tags: ['place=suburb', 'place=neighbourhood', 'place=quarter', 'place=town', 'place=village'] },
+];
+
+let offlineDB = [];
+function loadOfflineDBFromStorage() {
+  try {
+    const raw = localStorage.getItem(OFFLINE_DB_KEY);
+    offlineDB = raw ? JSON.parse(raw) : [];
+  } catch (e) { offlineDB = []; }
+}
+loadOfflineDBFromStorage();
+
+function offlineDBLastUpdate() {
+  const ts = localStorage.getItem(OFFLINE_DB_TS_KEY);
+  return ts ? new Date(parseInt(ts, 10)) : null;
+}
+
+// يحمّل كل فئة من فئات نقاط الاهتمام بكل العراق دفعة وحدة (باستخدام نفس خوادم Overpass المستخدمة
+// أصلاً بالتطبيق)، ثم الشوارع الرئيسية بالاسم — ويخزن الكل محلياً. onProgress(done,total,label) تُستدعى
+// بين كل فئة والثانية لتحديث شريط التقدم بواجهة الإعدادات.
+async function downloadIraqDatabase(onProgress) {
+  const b = IRAQ_BBOX;
+  const bbox = `${b.south},${b.west},${b.north},${b.east}`;
+  const collected = [];
+  const totalSteps = OFFLINE_DB_CATEGORIES.length + 1; // +1 لخطوة الشوارع بالأخير
+
+  for (let i = 0; i < OFFLINE_DB_CATEGORIES.length; i++) {
+    const cat = OFFLINE_DB_CATEGORIES[i];
+    // نغلّف onProgress بـ try/catch: خطأ بتحديث الواجهة هنا (خارج try الشبكة أصلاً) كان يقدر
+    // يفلت لبرّا الدالة كلها ويُظهر "فشل التحميل" رغم إن الشبكة تمام — هذا كان أرجح سبب للمشكلة
+    try { if (onProgress) onProgress(i + 1, totalSteps, cat.label); } catch (e) {}
+    try {
+      const clauses = cat.tags.map(t => `nwr[${t}](${bbox});`).join('\n      ');
+      const query = `[out:json][timeout:50];(\n      ${clauses}\n    );out center 1500;`;
+      const data = await fetchOverpass(query);
+      const elements = data.elements || [];
+      elements.forEach(el => {
+        const lat = el.lat ?? el.center?.lat;
+        const lon = el.lon ?? el.center?.lon;
+        if (lat == null || lon == null) return;
+        const tags = el.tags || {};
+        const name = tags['name:ar'] || tags.name;
+        if (!name) return; // نتجاهل عناصر بلا اسم مسجل — ما فيه فايدة نعرضها ببحث بالاسم
+        const kindKey = tags.amenity || tags.office || tags.place || '';
+        collected.push({ lat, lon, name, kind: kindLabel(kindKey), cat: cat.label });
+      });
+    } catch (e) { /* فشلت هذه الفئة — نتجاهلها ونكمل الباقي بدل ما يفشل التحميل كله */ }
+    await new Promise(res => setTimeout(res, 350)); // فسحة صغيرة بين كل فئة والثانية حتى لا نثقل الخوادم المجانية دفعة وحدة
+  }
+
+  // الشوارع الرئيسية (المسمّاة) بكل العراق — بسقف عدد معقول حتى ما يتضخم التخزين المحلي بلا داعي
+  try { if (onProgress) onProgress(totalSteps, totalSteps, 'الشوارع الرئيسية'); } catch (e) {}
+  try {
+    const streetQuery = `[out:json][timeout:60];(
+      way["highway"~"^(primary|secondary|tertiary|residential)$"]["name"](${bbox});
+    );out center 4000;`;
+    const data = await fetchOverpass(streetQuery);
+    const elements = data.elements || [];
+    const seen = new Set();
+    elements.forEach(el => {
+      const lat = el.lat ?? el.center?.lat;
+      const lon = el.lon ?? el.center?.lon;
+      if (lat == null || lon == null) return;
+      const tags = el.tags || {};
+      const name = tags['name:ar'] || tags.name;
+      if (!name) return;
+      const key = name + '|' + lat.toFixed(3) + '|' + lon.toFixed(3);
+      if (seen.has(key)) return;
+      seen.add(key);
+      collected.push({ lat, lon, name, kind: 'شارع', cat: 'شوارع' });
     });
-  } catch(e) {
-    spResults.innerHTML = '<div class="sp-empty">حدث خطأ، تحقق من الاتصال</div>';
+  } catch (e) { /* فشل بحث الشوارع — نكمل بباقي الفئات اللي نجحت */ }
+
+  offlineDB = collected;
+  try {
+    localStorage.setItem(OFFLINE_DB_KEY, JSON.stringify(collected));
+    localStorage.setItem(OFFLINE_DB_TS_KEY, String(Date.now()));
+  } catch (e) {
+    // لو المساحة المتوفرة بالمتصفح صغيرة، نحذف الشوارع أولاً (الأكبر حجماً) ونعيد المحاولة بنسخة مصغّرة
+    try {
+      const withoutStreets = collected.filter(c => c.cat !== 'شوارع');
+      localStorage.setItem(OFFLINE_DB_KEY, JSON.stringify(withoutStreets));
+      localStorage.setItem(OFFLINE_DB_TS_KEY, String(Date.now()));
+      offlineDB = withoutStreets;
+    } catch (e2) { /* حتى النسخة المصغّرة ما ضبطت — نكتفي بالنسخة بالذاكرة لهذه الجلسة فقط */ }
+  }
+  return collected.length;
+}
+
+// بحث فوري (بدون انترنت) داخل قاعدة البيانات المحلية المحمّلة مسبقاً — نفس منطق queryMapNames
+// لكن يغطي كل العراق (مو بس البلاطات المحمّلة حالياً بالخريطة)
+function queryOfflineDB(q) {
+  const qn = normalizeAr(q);
+  if (!qn || !offlineDB.length) return [];
+  const cat = findCategoryTags(q);
+  const catLabelNorm = cat ? normalizeAr(cat.label) : '';
+  const qTokens = qn.split(/\s+/).filter(Boolean);
+  const results = [];
+  for (const item of offlineDB) {
+    const nameNorm = normalizeAr(item.name);
+    const matchesName = qTokens.every(t => nameNorm.includes(t));
+    const matchesCategory = cat && normalizeAr(item.cat).includes(catLabelNorm);
+    if (!matchesName && !matchesCategory) continue;
+    results.push({
+      lat: item.lat, lon: item.lon,
+      display_name: item.name + (item.kind ? '، ' + item.kind : '') + '، العراق',
+      name: item.name, kind: item.kind, fromOffline: true
+    });
+    if (results.length >= (cat ? 60 : 30)) break;
+  }
+  return results;
+}
+
+// ربط زر "تحميل قاعدة بيانات العراق" بالإعدادات بدالة التحميل، مع عرض تقدّم العملية وحالتها
+(function initOfflineDBButton() {
+  const btn = document.getElementById('btnDownloadIraqDB');
+  const stateEl = document.getElementById('dbDownloadState');
+  if (!btn || !stateEl) return;
+  function refreshState() {
+    const ts = offlineDBLastUpdate();
+    if (offlineDB.length && ts) {
+      const days = Math.floor((Date.now() - ts.getTime()) / 86400000);
+      stateEl.textContent = days <= 0 ? `محدّثة اليوم (${offlineDB.length})` : `آخر تحديث قبل ${days} يوم (${offlineDB.length})`;
+      stateEl.style.color = '#4ade80';
+    } else {
+      stateEl.textContent = 'لم تُحمّل بعد';
+      stateEl.style.color = '#64748b';
+    }
+  }
+  refreshState();
+  btn.onclick = async () => {
+    if (btn.dataset.busy === '1') return;
+    btn.dataset.busy = '1';
+    btn.style.opacity = '0.6';
+    try {
+      const count = await downloadIraqDatabase((done, total, label) => {
+        // نغلّفها بـ try/catch حتى لو صار خطأ هنا (مثلاً العنصر تغيّر بالصفحة) ما يوقف التحميل كله
+        // ويظهر "فشل" وهمي رغم إن التحميل نفسه شغّال زين بالخلفية
+        try {
+          stateEl.textContent = `جاري التحميل: ${label} (${done}/${total})`;
+          stateEl.style.color = '#fbbf24';
+        } catch (e) { /* تجاهل خطأ تحديث الواجهة، لا يوقف عملية التحميل */ }
+      });
+      stateEl.textContent = count ? `تم التحميل ✓ (${count} مكان)` : 'ما توفرت بيانات، حاول لاحقاً';
+      stateEl.style.color = count ? '#4ade80' : '#f87171';
+    } catch (e) {
+      // نعرض سبب الخطأ الفعلي (بدل رسالة عامة) حتى نقدر نشخّص المشكلة الحقيقية لو تكررت
+      const detail = (e && (e.message || e.name)) ? ` (${e.message || e.name})` : '';
+      stateEl.textContent = 'فشل التحميل، تأكد من الانترنت وحاول مرة أخرى' + detail;
+      stateEl.style.color = '#f87171';
+      console.error('offline DB download failed:', e);
+    } finally {
+      btn.style.opacity = '1';
+      btn.dataset.busy = '0';
+    }
+  };
+})();
+
+async function doSearch(q) {
+  const reqId = ++searchReqId; // بصمة هذا البحث بالذات
+
+  // نلغي أي بحث سابق لسه شغال بالخلفية — يمنع تراكم عشرات الطلبات على نفس الخوادم العامة
+  // أثناء كتابة سريعة، وهذا هو السبب الرئيسي اللي كان يخلي البحث "يتوقف" بعد كم مرة متتالية
+  if (activeSearchAbort) activeSearchAbort.abort();
+  const searchAbort = new AbortController();
+  activeSearchAbort = searchAbort;
+
+  // بحث فئة عامة (كل المستشفيات/العيادات/الصيدليات...) يحتاج سقف نتائج أعلى من بحث اسم مكان محدد
+  const resultsCap = findCategoryTags(q) ? 60 : 30;
+
+  // 1) نتائج فورية من أسماء موجودة أصلاً على الخريطة + قاعدة بيانات العراق المحلية (لو محمّلة) — بدون انتظار الانترنت
+  const mapResults = queryMapNames(q);
+  const offlineResults = queryOfflineDB(q);
+  const localResults = mergePlaces(mapResults, 60, offlineResults);
+  if (localResults.length) renderSearchResults(localResults);
+
+  // 2) لو سبق وبحثنا بنفس النص خلال آخر دقائق، نعرض النتيجة المحفوظة فوراً بدون ضرب الشبكة من جديد
+  const cached = getCachedSearch(q);
+  if (cached) {
+    if (reqId !== searchReqId) return;
+    renderSearchResults(mergePlaces(cached, resultsCap, mapResults, offlineResults));
+    return;
+  }
+
+  let nominatimResults = [];
+  try {
+    // نطلق بحث Overpass (يغطي كل العراق بالاسم) بالتوازي من نفس اللحظة — مو بعد ما يخلص Nominatim،
+    // حتى ما تتأخر أو تنفقد نتائج موجودة بكل العراق وما لكيت إلها عنوان مسجل بـ Nominatim
+    const overpassPromise = overpassNameSearch(q, searchAbort.signal).catch(() => []);
+    // مصدر احتياطي (Photon) نطلقه بالتوازي أيضاً — يُستخدم فقط لو Nominatim رجّع فاضي بالكامل
+    // (Nominatim العام أحياناً يحجب هذا النمط من البحث الفوري أثناء الكتابة حسب سياسته)
+    const iraqViewbox = `${IRAQ_BBOX.west},${IRAQ_BBOX.north},${IRAQ_BBOX.east},${IRAQ_BBOX.south}`;
+    const photonPromise = photonSearch(q, { viewbox: iraqViewbox, limit: 10, signal: searchAbort.signal }).catch(() => []);
+
+    let viewbox;
+    if (userPos) {
+      const [lng, lat] = userPos;
+      const d = 0.6; // نطاق واسع (~65 كم) حول موقعك الحالي لترجيح النتائج القريبة أولاً
+      viewbox = `${lng - d},${lat + d},${lng + d},${lat - d}`;
+    }
+    // صيغتان بس (بدل 4) — كل بحث واحد كان يرسل حتى 4 طلبات متتالية لـ Nominatim، وهذا هو
+    // السبب الفعلي لتوقف البحث بعد بحثين/ثلاثة: الخادم العام يحجب مؤقتاً أي جهاز يرسل طلبات
+    // كثيرة بوقت قصير. صيغة "q + العراق" وحدها كافية بأغلب الحالات وتغطي الصيغة البسيطة تلقائياً.
+    const attempts = [
+      { q: q + ' العراق', countrycodes: 'iq', viewbox, limit: 14, signal: searchAbort.signal },
+      { q: q + ' العراق', countrycodes: 'iq', limit: 14, signal: searchAbort.signal }
+    ];
+
+    try {
+      // لو Nominatim حجبنا مؤخراً (رجع 429/403)، نتجاهله تماماً لفترة التهدئة ونعتمد على
+      // Photon/Overpass/القاعدة المحلية مباشرة، بدل ما نظل نحاول ونفشل بصمت كل بحث جديد
+      if (Date.now() >= nominatimBlockedUntil) {
+        for (const a of attempts) {
+          if (reqId !== searchReqId) return; // بحث أحدث بدأ، نوقف فوراً بدل استهلاك المزيد من الطلبات
+          try {
+            const arr = await nominatimSearch(a.q, a);
+            if (arr && arr.length) { nominatimResults = arr; break; }
+          } catch (e) {
+            if (e && e.blocked) { nominatimBlockedUntil = Date.now() + NOMINATIM_COOLDOWN_MS; break; }
+            /* نجرب الصيغة التالية */
+          }
+        }
+      }
+    } catch (e) { /* نكمل بقائمة فاضية، وربما Overpass يلقط نتائج */ }
+
+    // لو Nominatim رجّع فاضي تماماً (حجب/تعطل الخدمة العامة)، نستخدم نتائج Photon الاحتياطية
+    // بدل ما تظهر "لا توجد نتائج" لمكان معروف فعلاً مثل حي أو منطقة مشهورة
+    if (!nominatimResults.length) {
+      try {
+        const photonResults = await photonPromise;
+        if (reqId !== searchReqId) return;
+        // نبقي بس النتائج العراقية (نستبعد أماكن بنفس الاسم ببلد ثاني)
+        const iraqOnly = (photonResults || []).filter(p => !p.country || /iraq|عراق/i.test(p.country));
+        if (iraqOnly.length) nominatimResults = iraqOnly;
+      } catch (e) { /* نكمل بقائمة فاضية */ }
+    }
+
+    if (reqId !== searchReqId) return; // المستخدم كتب بحث أحدث، نتجاهل هذا الرد المتأخر
+    // نعرض نتائج Nominatim (مدموجة مع نتائج الخريطة الفورية والقاعدة المحلية) بدل ما ننتظر Overpass
+    renderSearchResults(mergePlaces(nominatimResults, resultsCap, mapResults, offlineResults));
+    if (nominatimResults.length) setCachedSearch(q, nominatimResults);
+
+    // ننتظر نتيجة Overpass (بحث الاسم بكل العراق) ونضمها — هذا هو المصدر اللي يغطي كل شيء بالعراق
+    // حتى الأماكن اللي ما إلها عنوان مسجل ومحفوظة بس كنقطة اهتمام باسمها
+    const overpassResults = await overpassPromise;
+    if (reqId !== searchReqId) return; // بحث أحدث صار بعده، نتجاهل
+    if (overpassResults && overpassResults.length) {
+      const finalResults = mergePlaces(nominatimResults, resultsCap, mapResults, offlineResults, overpassResults);
+      renderSearchResults(finalResults);
+      setCachedSearch(q, mergePlaces(nominatimResults, 60, overpassResults));
+    }
+  } catch (e) {
+    // شبكة تعطلت بشكل غير متوقع بالكامل — نتأكد إن البطاقة ما تبقى عالقة على "جاري البحث..." للأبد
+    if (reqId === searchReqId) renderSearchResults(mergePlaces([], resultsCap, mapResults, offlineResults));
   }
 }
 
@@ -4654,6 +5343,7 @@ let barExpanded = false;
   };
 
   sheet.addEventListener('pointerdown', (e) => {
+    if (sheet.classList.contains('qs-search-active')) return; // صفحة البحث الكاملة تُغلق بزر رجوع فقط، لا بالسحب
     if (e.target.closest(DRAG_IGNORE_SEL)) return; // البحث/الكتابة فقط تبقى مستثناة
     measure();
     dragCandidate = true;
@@ -4758,6 +5448,49 @@ function clearRoute() {
 document.getElementById('btnClear').onclick = () => { hideOverview(); clearRoute(); };
 document.getElementById('btnCancelRoute').onclick = () => { hideOverview(); clearRoute(); };
 
+// ══════════════════════════════════════════════
+// GLOBE AUTO-SATELLITE — عند الابتعاد لمستوى الكرة الأرضية (زوم منخفض جداً)
+// نعرض صورة القمر الصناعي الحقيقية بدل الطبقات المتجهية المُنسّقة: منظر طبيعي دقيق للكوكب
+// وأخف على الأداء لأنها صورة واحدة بدل عشرات طبقات الخطوط/المباني/التسميات
+// ══════════════════════════════════════════════
+let autoGlobeSat = false;
+const GLOBE_SAT_ZOOM = 9.5;
+function updateGlobeAutoSatellite() {
+  if (mapMode === 'satellite') return; // القمر الصناعي مفعّل يدوياً أصلاً — لا تتدخل
+  const wantAuto = map.getZoom() < GLOBE_SAT_ZOOM;
+  if (wantAuto === autoGlobeSat) return;
+  autoGlobeSat = wantAuto;
+  if (autoGlobeSat) {
+    setLayersVisible(NIGHT_LAYER_IDS, false);
+    setLayersVisible(DAY_LAYER_IDS, false);
+    map.setLayoutProperty('satBase', 'visibility', 'visible');
+  } else {
+    setLayersVisible(NIGHT_LAYER_IDS, isNight);
+    setLayersVisible(DAY_LAYER_IDS, !isNight);
+    map.setLayoutProperty('satBase', 'visibility', 'none');
+  }
+}
+map.on('zoom', updateGlobeAutoSatellite);
+// نطبّق حالة القمر الصناعي/التضاريس فور تحميل الأنماط — الخريطة تفتح أصلاً بزوم الكرة الأرضية (0.7)
+// وبدون هذا الاستدعاء ما راح تتفعّل صورة القمر الصناعي تلقائياً لأن حدث 'zoom' ما يصير إلا بعد أول تحريك فعلي
+map.once('load', updateGlobeAutoSatellite);
+
+// ══════════════════════════════════════════════
+// زر "الكوكب" — يبعد الكاميرا لمستوى الكرة الأرضية، وبالضغط ثانية يرجع لآخر موقع كان معروض
+// ══════════════════════════════════════════════
+let globeSavedView = null;
+document.getElementById('btnGlobe').onclick = function() {
+  const showingGlobe = this.classList.contains('on');
+  if (!showingGlobe) {
+    globeSavedView = { center: map.getCenter(), zoom: map.getZoom(), pitch: map.getPitch(), bearing: map.getBearing() };
+    if (followMode) document.getElementById('btnFollow').click(); // وقف التتبع حتى ما ترجع الكاميرا وحدها
+    map.flyTo({ center: globeSavedView.center, zoom: 0.7, pitch: 0, bearing: 0, duration: 2200, essential: true });
+  } else if (globeSavedView) {
+    map.flyTo({ center: globeSavedView.center, zoom: globeSavedView.zoom, pitch: globeSavedView.pitch, bearing: globeSavedView.bearing, duration: 1600, essential: true });
+  }
+  this.classList.toggle('on', !showingGlobe);
+};
+
 document.getElementById('btnFollow').onclick = function() {
   followMode = !followMode;
   this.classList.toggle('on', followMode);
@@ -4778,6 +5511,7 @@ function applyDayNightVisuals() {
   document.getElementById('btnDayNight').classList.toggle('on', !isNight);
   setLayersVisible(NIGHT_LAYER_IDS, isNight);
   setLayersVisible(DAY_LAYER_IDS, !isNight);
+  document.getElementById('spaceMoon').style.display = isNight ? 'block' : 'none';
   document.getElementById('dayNightIcon').setAttribute('data-lucide', isNight ? 'moon' : 'sun');
   document.body.classList.toggle('day-mode', !isNight);
   applyMainArrowColor();
@@ -5267,8 +6001,64 @@ async function nominatimSearch(q, opts = {}) {
   if (opts.countrycodes) params.set('countrycodes', opts.countrycodes);
   if (opts.viewbox) { params.set('viewbox', opts.viewbox); params.set('bounded', '1'); }
   const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
-  const r = await fetch(url, { headers: { 'Accept-Language': 'ar' } });
-  return r.json();
+  const ctrl = new AbortController();
+  if (opts.signal) {
+    if (opts.signal.aborted) ctrl.abort();
+    else opts.signal.addEventListener('abort', () => ctrl.abort(), { once: true });
+  }
+  await nominatimRateGate(); // نلتزم بحد أقصى طلب واحد كل ~1.1 ثانية حتى ما تحظرنا الخدمة العامة
+  if (ctrl.signal.aborted) throw new Error('aborted');
+  const timer = setTimeout(() => ctrl.abort(), 6000); // ما ننتظر أكثر من 6 ثواني لكل محاولة
+  try {
+    const r = await fetch(url, { headers: { 'Accept-Language': 'ar' }, signal: ctrl.signal });
+    // Nominatim العام أحياناً يرفض الطلب (استخدام مكثف/بحث فوري بالكتابة يخالف سياسته) —
+    // نتأكد من نجاح الطلب فعلياً بدل قراءة رد خطأ وكأنه نتائج فاضية بصمت
+    if (!r.ok) {
+      const err = new Error('HTTP ' + r.status);
+      if (r.status === 429 || r.status === 403) err.blocked = true; // نعلّمه حتى نفعّل فترة التهدئة
+      throw err;
+    }
+    return await r.json();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// مصدر بديل (Photon من Komoot) — مبني أصلاً لبحث فوري أثناء الكتابة (autocomplete)، عكس
+// Nominatim اللي سياسته الرسمية تمنع هذا النمط من الاستخدام وقد يحجب الطلبات المتكررة.
+// نستخدمه كخط دفاع ثانٍ إذا Nominatim رجّع فاضي أو فشل، حتى ما تختفي نتائج أماكن معروفة فعلاً.
+async function photonSearch(q, opts = {}) {
+  const params = new URLSearchParams({ q, lang: 'ar', limit: opts.limit || 8 });
+  if (opts.viewbox) {
+    // Photon يريد bbox بصيغة minLon,minLat,maxLon,maxLat — نحوّلها من صيغة viewbox المستخدمة بالتطبيق
+    const [lng1, lat1, lng2, lat2] = opts.viewbox.split(',').map(Number);
+    params.set('bbox', `${Math.min(lng1,lng2)},${Math.min(lat1,lat2)},${Math.max(lng1,lng2)},${Math.max(lat1,lat2)}`);
+  }
+  const url = `https://photon.komoot.io/api/?${params.toString()}`;
+  const ctrl = new AbortController();
+  if (opts.signal) {
+    if (opts.signal.aborted) ctrl.abort();
+    else opts.signal.addEventListener('abort', () => ctrl.abort(), { once: true });
+  }
+  const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const r = await fetch(url, { signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const data = await r.json();
+    const feats = data.features || [];
+    return feats.map(f => {
+      const p = f.properties || {};
+      const [lon, lat] = f.geometry?.coordinates || [];
+      if (typeof lon !== 'number' || typeof lat !== 'number') return null;
+      // لو الاسم مو عراقي بوضوح (نفس نتيجة من بلد ثاني بنفس الاسم) نستبعده لاحقاً بفلتر العراق بمكان الاستدعاء
+      const nameParts = [p.name, p.district, p.city, p.state, p.country].filter(Boolean);
+      return { lat, lon, display_name: nameParts.join('، '), name: p.name || q, country: p.country };
+    }).filter(Boolean);
+  } catch (e) {
+    return [];
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function searchDestination(destText) {
@@ -5493,96 +6283,29 @@ if (map.isStyleLoaded()) applyBlockNumbersVisibility();
 else map.once('load', applyBlockNumbersVisibility);
 
 // ══════════════════════════════════════════════
-// SPEED HUD — عداد سرعة نصف دائري (إبرة + درجات + أرقام) بألوان أخضر→أصفر→برتقالي→أحمر
+// SPEED HUD — عداد سرعة رقمي دائري (دائرة بيضاء متقطعة حول رقم بالمنتصف)
+// اللون الافتراضي أبيض (ليلي) / أسود (نهاري) — يتحول أصفر عند 50، برتقالي عند 80، أحمر بعد 80
 // ══════════════════════════════════════════════
-const GAUGE_MAX   = 220;   // أقصى سرعة يوصلها التدريج
-const GAUGE_CX    = 110, GAUGE_CY = 100, GAUGE_R = 80; // مركز ونصف قطر التدريج
-const GAUGE_START = 150;   // زاوية البداية (0 كم/س) بالدرجات القياسية
-const GAUGE_SWEEP = 240;   // مجموع زاوية الانحناء الكلي
-
-function gaugeAngleDeg(v) { return GAUGE_START + (v / GAUGE_MAX) * GAUGE_SWEEP; }
-function gaugePoint(v, r) {
-  const rad = gaugeAngleDeg(v) * Math.PI / 180;
-  return { x: GAUGE_CX + r * Math.cos(rad), y: GAUGE_CY + r * Math.sin(rad) };
-}
-
-function buildSpeedGauge() {
-  const svg = document.getElementById('speedGaugeSvg');
-  const NS = 'http://www.w3.org/2000/svg';
-  const el = (tag, attrs) => {
-    const n = document.createElementNS(NS, tag);
-    for (const k in attrs) n.setAttribute(k, attrs[k]);
-    return n;
-  };
-
-  // تدرّج اللون على طول القوس: أخضر → أصفر → برتقالي → أحمر
-  const p0 = gaugePoint(0, GAUGE_R), p1 = gaugePoint(GAUGE_MAX, GAUGE_R);
-  const grad = el('linearGradient', { id: 'gaugeGrad', gradientUnits: 'userSpaceOnUse', x1: p0.x, y1: p0.y, x2: p1.x, y2: p1.y });
-  [['0%', '#22c55e'], ['33%', '#facc15'], ['66%', '#fb923c'], ['100%', '#ef4444']].forEach(([off, col]) => {
-    grad.appendChild(el('stop', { offset: off, 'stop-color': col }));
-  });
-  const defs = el('defs', {});
-  defs.appendChild(grad);
-  svg.appendChild(defs);
-
-  // القوس الملوّن الخارجي
-  const bandStart = gaugePoint(0, GAUGE_R), bandEnd = gaugePoint(GAUGE_MAX, GAUGE_R);
-  const bandPath = `M ${bandStart.x} ${bandStart.y} A ${GAUGE_R} ${GAUGE_R} 0 1 1 ${bandEnd.x} ${bandEnd.y}`;
-  svg.appendChild(el('path', { d: bandPath, fill: 'none', stroke: 'url(#gaugeGrad)', 'stroke-width': 10, 'stroke-linecap': 'round' }));
-
-  // درجات التدريج والأرقام
-  for (let v = 0; v <= GAUGE_MAX; v += 20) {
-    const isMajor = v % 40 === 0;
-    const rOuter = GAUGE_R - 7;
-    const rInner = rOuter - (isMajor ? 10 : 6);
-    const a = gaugePoint(v, rOuter), b = gaugePoint(v, rInner);
-    svg.appendChild(el('line', {
-      x1: a.x, y1: a.y, x2: b.x, y2: b.y,
-      stroke: '#e2e8f0', 'stroke-width': isMajor ? 2.2 : 1.3, 'stroke-linecap': 'round'
-    }));
-    if (isMajor) {
-      const t = gaugePoint(v, rInner - 12);
-      const txt = el('text', {
-        x: t.x, y: t.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle',
-        'font-size': 12, 'font-weight': 800, fill: '#e2e8f0', 'font-family': "'Cairo',sans-serif"
-      });
-      txt.textContent = v;
-      svg.appendChild(txt);
-    }
-  }
-
-  // القاعدة (النص + الإبرة) في الفراغ الداخلي
-  const needleGroup = el('g', { id: 'needleGroup', style: 'transition:transform .3s ease-out; transform-origin:' + GAUGE_CX + 'px ' + GAUGE_CY + 'px;' });
-  needleGroup.appendChild(el('line', { x1: GAUGE_CX, y1: GAUGE_CY + 10, x2: GAUGE_CX, y2: GAUGE_CY - 60, stroke: '#ef4444', 'stroke-width': 3, 'stroke-linecap': 'round' }));
-  needleGroup.appendChild(el('circle', { cx: GAUGE_CX, cy: GAUGE_CY, r: 6, fill: '#ef4444', stroke: '#7f1d1d', 'stroke-width': 1.5 }));
-  svg.appendChild(needleGroup);
-
-  // النص (تحت الدنبوس/محور الإبرة)
-  svg.appendChild(el('text', { id: 'gaugeSpeedVal', x: GAUGE_CX, y: GAUGE_CY + 30, 'text-anchor': 'middle', 'font-size': 22, 'font-weight': 900, fill: '#e2e8f0', 'font-family': "'Cairo',sans-serif" }));
-  svg.appendChild(el('text', { x: GAUGE_CX, y: GAUGE_CY + 45, 'text-anchor': 'middle', 'font-size': 9.5, 'font-weight': 700, fill: '#4ade80', 'font-family': "'Cairo',sans-serif" })).textContent = 'km/h';
-  document.getElementById('gaugeSpeedVal').textContent = '0';
-}
-buildSpeedGauge();
-
-function setGaugeNeedle(speedKmh) {
-  const v = Math.max(0, Math.min(GAUGE_MAX, speedKmh));
-  const rotationDeg = (v / GAUGE_MAX) * GAUGE_SWEEP - 120; // انحراف الإبرة عن وضعها الأساسي (لأعلى)
-  const g = document.getElementById('needleGroup');
-  if (g) g.style.transform = `rotate(${rotationDeg}deg)`;
+function speedRingColor(speedKmh) {
+  if (speedKmh > 80) return '#ef4444';   // أحمر — تجاوز 80
+  if (speedKmh >= 80) return '#fb923c';  // برتقالي — وصل 80
+  if (speedKmh >= 50) return '#facc15';  // أصفر — وصل 50
+  return null; // اللون الافتراضي (يبقى كما محدد بالـ CSS حسب الوضع الليلي/النهاري)
 }
 
 function updateSpeedHUD() {
-  const val = document.getElementById('gaugeSpeedVal');
-  const hud = document.getElementById('speedHUD');
-  val.textContent = lastSpeedKmh;
-  setGaugeNeedle(lastSpeedKmh);
-  if (lastSpeedKmh > speedLimit) {
-    hud.style.borderColor = '#ef4444';
-    val.style.fill = '#f87171';
+  const val  = document.getElementById('speedGaugeNum');
+  const ring = document.getElementById('speedRingCircle');
+  const v = Math.max(0, Math.round(lastSpeedKmh));
+  val.textContent = v;
+
+  const color = speedRingColor(v);
+  ring.style.stroke = color || '';
+  val.style.color = color || '';
+
+  if (v > speedLimit) {
     if (!speedOverAlerted) { speedOverAlerted = true; speak('انتبه، تجاوزت السرعة المسموحة'); }
   } else {
-    hud.style.borderColor = 'rgba(34,197,94,0.4)';
-    val.style.fill = '#e2e8f0';
     speedOverAlerted = false;
   }
 }
